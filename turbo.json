@@ -1,9 +1,16 @@
 {
-	"$schema": "https://turbo.build/schema.json",
-	"cacheDir": ".turbo/cache",
-	"tasks": {
-		"tsc:check": {
-			"dependsOn": ["^tsc:check"]
-		}
-	}
+    "$schema": "https://turbo.build/schema.json",
+    "cacheDir": ".turbo/cache",
+    "tasks": {
+        "tsc:check": {
+            "dependsOn": [
+                "^tsc:check"
+            ]
+        },
+        "clean": {
+            "cache": false,
+            "inputs": [],
+            "outputs": []
+        }
+    }
 }

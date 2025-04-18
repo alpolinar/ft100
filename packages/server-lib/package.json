@@ -8,7 +8,12 @@
     "types": "lib/esm/index.d.ts",
     "scripts": {
         "build": "pnpm run build:lib",
-        "clean": "rimraf lib node_modules"
+        "clean": "rimraf lib node_modules",
+        "build:lib": "pnpm compile:common && pnpm compile:esm",
+        "build:lib:dev": "tsc --outDir ./lib/cjs --module CommonJS --incremental",
+        "compile:common": "tsc --outDir ./lib/cjs --module CommonJS",
+        "compile:esm": "tsc --outDir ./lib/esm",
+        "gt:gen": "graphql-codegen --config codegen.yml && pnpm dlx @biomejs/biome format --write ./src/generated/*"
     },
     "keywords": [],
     "author": "Al Polinar",

@@ -1,0 +1,9 @@
+{
+	"$schema": "https://turbo.build/schema.json",
+	"cacheDir": ".turbo/cache",
+	"tasks": {
+		"tsc:check": {
+			"dependsOn": ["^tsc:check"]
+		}
+	}
+}

@@ -41,10 +41,6 @@ export class Query {
     readonly healthcheck: Scalars["String"]["output"];
 }
 
-export class Test {
-    readonly name: Scalars["String"]["output"];
-}
-
 export type ResolverTypeWrapper<T> = T;
 
 export type Resolver<
@@ -155,7 +151,6 @@ export type ResolversTypes = {
     Boolean: ResolverTypeWrapper<Scalars["Boolean"]["output"]>;
     Query: ResolverTypeWrapper<{}>;
     String: ResolverTypeWrapper<Scalars["String"]["output"]>;
-    Test: ResolverTypeWrapper<Test>;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -163,7 +158,6 @@ export type ResolversParentTypes = {
     Boolean: Scalars["Boolean"]["output"];
     Query: {};
     String: Scalars["String"]["output"];
-    Test: Test;
 };
 
 export type QueryResolvers<
@@ -174,22 +168,10 @@ export type QueryResolvers<
     healthcheck?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
 };
 
-export type TestResolvers<
-    ContextType = any,
-    ParentType extends
-        ResolversParentTypes["Test"] = ResolversParentTypes["Test"],
-> = {
-    name?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
-    __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
 export type Resolvers<ContextType = any> = {
     Query?: QueryResolvers<ContextType>;
-    Test?: TestResolvers<ContextType>;
 };
 
 export type HealthcheckQueryVariables = Exact<{ [key: string]: never }>;
 
 export type HealthcheckQuery = { readonly healthcheck: string };
-
-export type TestFragment = { readonly name: string };

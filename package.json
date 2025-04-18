@@ -1,13 +1,14 @@
 {
     "name": "root",
-    "version": "0.0.0",
+    "version": "0.0.1",
     "description": "",
-    "main": "index.js",
     "scripts": {
+        "build:lib": "turbo build:lib",
+        "build:all": "turbo build",
         "bootstrap": "pnpm install",
         "bootstrap:clean": "pnpm clean && pnpm install",
         "clean": "turbo clean && rimraf node_modules",
-        "tsc:check": "turbo tsc:check"
+        "tsc:check": "turbo tsc:check --filter=@ods/*"
     },
     "workspaces": [
         "packages/*"
@@ -23,8 +24,11 @@
     },
     "pnpm": {
         "onlyBuiltDependencies": [
+            "@apollo/protobufjs",
             "@biomejs/biome",
-            "@nestjs/core"
+            "@nestjs/core",
+            "@swc/core",
+            "lefthook"
         ]
     }
 }

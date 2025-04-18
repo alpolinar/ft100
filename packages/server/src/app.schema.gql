@@ -1,15 +1,7 @@
-type Test {
-    name: String!
-}
-
 type Query {
     healthcheck: String!
 }
 
 query healthcheck {
     healthcheck
-}
-
-fragment Test on Test {
-    name
 }

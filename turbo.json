@@ -2,10 +2,28 @@
     "$schema": "https://turbo.build/schema.json",
     "cacheDir": ".turbo/cache",
     "tasks": {
+        "gt:gen": {
+            "inputs": [
+                "$TURBO_DEFAULT$",
+                "$TURBO_ROOT$/**/*.gql",
+                "src/**/*.gql",
+                "!src/**/generated/*.ts",
+                "!.turbo/**/*"
+            ],
+            "outputs": ["src/**/generated/*.ts"]
+        },
+        "build:lib": {
+            "dependsOn": ["^build:lib", "^gt:gen"],
+            "inputs": ["$TURBO_DEFAULT$"],
+            "outputs": ["lib/**", ".next/**", "!.next/cache/**"]
+        },
+        "build": {
+            "dependsOn": ["^build:lib"],
+            "inputs": ["$TURBO_DEFAULT$"],
+            "outputs": ["dist/**", "lib/**", ".next/**", "!.next/cache/**"]
+        },
         "tsc:check": {
-            "dependsOn": [
-                "^tsc:check"
-            ]
+            "dependsOn": ["^tsc:check"]
         },
         "clean": {
             "cache": false,

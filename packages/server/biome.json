@@ -1,49 +1,5 @@
 {
-    "$schema": "https://biomejs.dev/schemas/1.9.0/schema.json",
-    "files": {
-        "ignore": [
-            "node_modules/**/*"
-        ],
-        "maxSize": 5242880
-    },
-    "organizeImports": {
-        "enabled": true
-    },
-    "linter": {
-        "enabled": true,
-        "rules": {
-            "recommended": true,
-            "style": {
-                "useConst": {
-                    "level": "warn",
-                    "fix": "none"
-                },
-                "useImportType": "off"
-            },
-            "correctness": {
-                "noUnusedVariables": {
-                    "fix": "safe",
-                    "level": "warn"
-                }
-            },
-            "complexity": {
-                "noBannedTypes": "off"
-            }
-        },
-        "ignore": []
-    },
-    "formatter": {
-        "enabled": true,
-        "indentStyle": "space",
-        "indentWidth": 4,
-        "lineWidth": 80
-    },
-    "javascript": {
-        "formatter": {
-            "trailingCommas": "es5"
-        },
-        "parser": {
-            "unsafeParameterDecoratorsEnabled": true
-        }
-    }
+    "extends": [
+        "../../biome.json"
+    ]
 }

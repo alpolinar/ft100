@@ -1,0 +1,7 @@
+type Subscription {
+    testSub(channelId: String!): Int!
+}
+
+subscription testSub($channelId: String!) {
+    testSub(channelId: $channelId)
+}

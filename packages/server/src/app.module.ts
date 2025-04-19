@@ -7,6 +7,7 @@ import { AppResolver } from "./app.resolver";
 import { AppService } from "./app.service";
 import { configOptions } from "./config/environments";
 import { GraphQLOptions } from "./config/graphql/graphql.options";
+import { APP_MODULES } from "./config/modules";
 
 @Module({
     imports: [
@@ -16,6 +17,7 @@ import { GraphQLOptions } from "./config/graphql/graphql.options";
             useClass: GraphQLOptions,
             imports: [],
         }),
+        ...APP_MODULES,
     ],
     controllers: [],
     providers: [AppConfigService, AppService, AppResolver],

@@ -28,6 +28,9 @@ export type Incremental<T> =
               ? T[P]
               : never;
       };
+export type RequireFields<T, K extends keyof T> = Omit<T, K> & {
+    [P in K]-?: NonNullable<T[P]>;
+};
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
     ID: { input: string; output: string };
@@ -40,6 +43,14 @@ export type Scalars = {
 export class Query {
     readonly healthcheck: Scalars["String"]["output"];
 }
+
+export class Subscription {
+    readonly testSub: Scalars["Int"]["output"];
+}
+
+export type SubscriptionTestSubArgs = {
+    channelId: Scalars["String"]["input"];
+};
 
 export type ResolverTypeWrapper<T> = T;
 
@@ -149,15 +160,19 @@ export type DirectiveResolverFn<
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
     Boolean: ResolverTypeWrapper<Scalars["Boolean"]["output"]>;
+    Int: ResolverTypeWrapper<Scalars["Int"]["output"]>;
     Query: ResolverTypeWrapper<{}>;
     String: ResolverTypeWrapper<Scalars["String"]["output"]>;
+    Subscription: ResolverTypeWrapper<{}>;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
     Boolean: Scalars["Boolean"]["output"];
+    Int: Scalars["Int"]["output"];
     Query: {};
     String: Scalars["String"]["output"];
+    Subscription: {};
 };
 
 export type QueryResolvers<
@@ -168,10 +183,31 @@ export type QueryResolvers<
     healthcheck?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
 };
 
+export type SubscriptionResolvers<
+    ContextType = any,
+    ParentType extends
+        ResolversParentTypes["Subscription"] = ResolversParentTypes["Subscription"],
+> = {
+    testSub?: SubscriptionResolver<
+        ResolversTypes["Int"],
+        "testSub",
+        ParentType,
+        ContextType,
+        RequireFields<SubscriptionTestSubArgs, "channelId">
+    >;
+};
+
 export type Resolvers<ContextType = any> = {
     Query?: QueryResolvers<ContextType>;
+    Subscription?: SubscriptionResolvers<ContextType>;
 };
 
 export type HealthcheckQueryVariables = Exact<{ [key: string]: never }>;
 
 export type HealthcheckQuery = { readonly healthcheck: string };
+
+export type TestSubSubscriptionVariables = Exact<{
+    channelId: Scalars["String"]["input"];
+}>;
+
+export type TestSubSubscription = { readonly testSub: number };

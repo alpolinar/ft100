@@ -7,7 +7,7 @@ import { z } from "zod";
 import { join } from "node:path";
 
 export const envSchema = z.object({
-    APP_PORT: z.number({ coerce: true }).default(3001),
+    APP_PORT: z.coerce.number().default(3001),
 });
 
 export const configOptions: ConfigModuleOptions = {

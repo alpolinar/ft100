@@ -53,12 +53,21 @@ importers:
       '@swc/core':
         specifier: ^1.11.21
         version: 1.11.21
+      chalk:
+        specifier: ^5.4.1
+        version: 5.4.1
       class-transformer:
         specifier: ^0.5.1
         version: 0.5.1
       class-validator:
         specifier: ^0.14.1
         version: 0.14.1
+      cli-table3:
+        specifier: ^0.6.5
+        version: 0.6.5
+      figlet:
+        specifier: ^1.8.1
+        version: 1.8.1
       graphql:
         specifier: ^16.10.0
         version: 16.10.0
@@ -90,6 +99,9 @@ importers:
       '@types/express':
         specifier: ^5.0.0
         version: 5.0.1
+      '@types/figlet':
+        specifier: ^1.7.0
+        version: 1.7.0
       '@types/jest':
         specifier: ^29.5.2
         version: 29.5.14
@@ -1259,6 +1271,9 @@ packages:
   '@types/express@5.0.1':
     resolution: {integrity: sha512-UZUw8vjpWFXuDnjFTh7/5c2TWDlQqeXHi6hcN7F2XSVT5P+WmUnnbFS3KA6Jnc6IsEqI2qCVu2bK0R0J4A8ZQQ==}
 
+  '@types/figlet@1.7.0':
+    resolution: {integrity: sha512-KwrT7p/8Eo3Op/HBSIwGXOsTZKYiM9NpWRBJ5sVjWP/SmlS+oxxRvJht/FNAtliJvja44N3ul1yATgohnVBV0Q==}
+
   '@types/graceful-fs@4.1.9':
     resolution: {integrity: sha512-olP3sd1qOEe5dXTSaFvQG+02VdRXcdytWLAZsAq1PecU8uqQAhkrnbli7DagjtXKW/Bl7YJbUsa8MPcuc8LHEQ==}
 
@@ -2133,6 +2148,11 @@ packages:
 
   fflate@0.8.2:
     resolution: {integrity: sha512-cPJU47OaAoCbg0pBvzsgpTPhmhqI5eJjh/JIu8tPj5q+T7iLvW/JAYUqmE7KOB4R1ZyEhzBaIQpQpardBF5z8A==}
+
+  figlet@1.8.1:
+    resolution: {integrity: sha512-kEC3Sme+YvA8Hkibv0NR1oClGcWia0VB2fC1SlMy027cwe795Xx40Xiv/nw/iFAwQLupymWh+uhAAErn/7hwPg==}
+    engines: {node: '>= 0.4.0'}
+    hasBin: true
 
   figures@3.2.0:
     resolution: {integrity: sha512-yaduQFRKLXYOGgEn6AZau90j3ggSOyiqXU0F9JZfeXYhNa+Jk4X+s45A2zg5jns87GAFa34BBm2kXw4XpNcbdg==}
@@ -5548,6 +5568,8 @@ snapshots:
       '@types/express-serve-static-core': 5.0.6
       '@types/serve-static': 1.15.7
 
+  '@types/figlet@1.7.0': {}
+
   '@types/graceful-fs@4.1.9':
     dependencies:
       '@types/node': 20.17.30
@@ -6517,6 +6539,8 @@ snapshots:
       web-streams-polyfill: 3.3.3
 
   fflate@0.8.2: {}
+
+  figlet@1.8.1: {}
 
   figures@3.2.0:
     dependencies:

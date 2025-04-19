@@ -1,7 +1,9 @@
 import { Logger, ValidationPipe } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { NestFactory } from "@nestjs/core";
+import pkg from "../package.json";
 import { AppModule } from "./app.module";
+import { bootstrapWrapper, info } from "./misc/bootstrap";
 
 async function bootstrap() {
     const logger = new Logger("Root");
@@ -29,5 +31,7 @@ async function bootstrap() {
     );
 
     await app.listen(port);
+    info(pkg.version, pkg.name, port);
 }
-bootstrap();
+
+(() => bootstrapWrapper(bootstrap))();

@@ -43,6 +43,7 @@
         "lib/**/*"
     ],
     "dependencies": {
+        "@graphql-codegen/typescript-react-apollo": "^4.3.2",
         "zod": "^3.24.3"
     },
     "devDependencies": {

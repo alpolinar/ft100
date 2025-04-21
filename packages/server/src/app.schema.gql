@@ -1,3 +1,5 @@
+scalar Date
+
 type Query {
     healthcheck: String!
 }
@@ -5,3 +7,5 @@ type Query {
 query healthcheck {
     healthcheck
 }
+
+type Mutation {}

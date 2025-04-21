@@ -1,9 +1,9 @@
 import { Query, Resolver } from "@nestjs/graphql";
-import { AppConfigService } from "./app.config.service";
+import { AppService } from "./app.service";
 
 @Resolver()
 export class AppResolver {
-    constructor(private readonly appConfigService: AppConfigService) {}
+    constructor(private readonly appService: AppService) {}
 
     @Query(() => String)
     healthcheck() {

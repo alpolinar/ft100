@@ -5,7 +5,13 @@
  */
 /* eslint-disable */
 
-import { GraphQLResolveInfo } from "graphql";
+import {
+    GraphQLResolveInfo,
+    GraphQLScalarType,
+    GraphQLScalarTypeConfig,
+} from "graphql";
+import { gql } from "@apollo/client";
+import * as Apollo from "@apollo/client";
 export type Maybe<T> = T | undefined | null;
 export type InputMaybe<T> = T | undefined | null;
 export type Exact<T extends { [key: string]: unknown }> = {
@@ -31,6 +37,7 @@ export type Incremental<T> =
 export type RequireFields<T, K extends keyof T> = Omit<T, K> & {
     [P in K]-?: NonNullable<T[P]>;
 };
+const defaultOptions = {} as const;
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
     ID: { input: string; output: string };
@@ -38,6 +45,15 @@ export type Scalars = {
     Boolean: { input: boolean; output: boolean };
     Int: { input: number; output: number };
     Float: { input: number; output: number };
+    Date: { input: Date; output: Date };
+};
+
+export class Mutation {
+    readonly sendData?: Maybe<TestData>;
+}
+
+export type MutationSendDataArgs = {
+    channelId: Scalars["String"]["input"];
 };
 
 export class Query {
@@ -51,6 +67,12 @@ export class Subscription {
 export type SubscriptionTestSubArgs = {
     channelId: Scalars["String"]["input"];
 };
+
+export class TestData {
+    readonly age: Scalars["Int"]["output"];
+    readonly birthday: Scalars["Date"]["output"];
+    readonly name: Scalars["String"]["output"];
+}
 
 export type ResolverTypeWrapper<T> = T;
 
@@ -160,19 +182,43 @@ export type DirectiveResolverFn<
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
     Boolean: ResolverTypeWrapper<Scalars["Boolean"]["output"]>;
+    Date: ResolverTypeWrapper<Scalars["Date"]["output"]>;
     Int: ResolverTypeWrapper<Scalars["Int"]["output"]>;
+    Mutation: ResolverTypeWrapper<{}>;
     Query: ResolverTypeWrapper<{}>;
     String: ResolverTypeWrapper<Scalars["String"]["output"]>;
     Subscription: ResolverTypeWrapper<{}>;
+    TestData: ResolverTypeWrapper<TestData>;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
     Boolean: Scalars["Boolean"]["output"];
+    Date: Scalars["Date"]["output"];
     Int: Scalars["Int"]["output"];
+    Mutation: {};
     Query: {};
     String: Scalars["String"]["output"];
     Subscription: {};
+    TestData: TestData;
+};
+
+export interface DateScalarConfig
+    extends GraphQLScalarTypeConfig<ResolversTypes["Date"], any> {
+    name: "Date";
+}
+
+export type MutationResolvers<
+    ContextType = any,
+    ParentType extends
+        ResolversParentTypes["Mutation"] = ResolversParentTypes["Mutation"],
+> = {
+    sendData?: Resolver<
+        Maybe<ResolversTypes["TestData"]>,
+        ParentType,
+        ContextType,
+        RequireFields<MutationSendDataArgs, "channelId">
+    >;
 };
 
 export type QueryResolvers<
@@ -197,17 +243,223 @@ export type SubscriptionResolvers<
     >;
 };
 
+export type TestDataResolvers<
+    ContextType = any,
+    ParentType extends
+        ResolversParentTypes["TestData"] = ResolversParentTypes["TestData"],
+> = {
+    age?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
+    birthday?: Resolver<ResolversTypes["Date"], ParentType, ContextType>;
+    name?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+    __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type Resolvers<ContextType = any> = {
+    Date?: GraphQLScalarType;
+    Mutation?: MutationResolvers<ContextType>;
     Query?: QueryResolvers<ContextType>;
     Subscription?: SubscriptionResolvers<ContextType>;
+    TestData?: TestDataResolvers<ContextType>;
 };
 
 export type HealthcheckQueryVariables = Exact<{ [key: string]: never }>;
 
 export type HealthcheckQuery = { readonly healthcheck: string };
 
+export type SendDataMutationVariables = Exact<{
+    channelId: Scalars["String"]["input"];
+}>;
+
+export type SendDataMutation = {
+    readonly sendData?:
+        | {
+              readonly name: string;
+              readonly age: number;
+              readonly birthday: Date;
+          }
+        | undefined
+        | null;
+};
+
+export type TestDataFragment = {
+    readonly name: string;
+    readonly age: number;
+    readonly birthday: Date;
+};
+
 export type TestSubSubscriptionVariables = Exact<{
     channelId: Scalars["String"]["input"];
 }>;
 
 export type TestSubSubscription = { readonly testSub: number };
+
+export const TestDataFragmentDoc = gql`
+    fragment TestData on TestData {
+  name
+  age
+  birthday
+}
+    `;
+export const HealthcheckDocument = gql`
+    query healthcheck {
+  healthcheck
+}
+    `;
+
+/**
+ * __useHealthcheckQuery__
+ *
+ * To run a query within a React component, call `useHealthcheckQuery` and pass it any options that fit your needs.
+ * When your component renders, `useHealthcheckQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useHealthcheckQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useHealthcheckQuery(
+    baseOptions?: Apollo.QueryHookOptions<
+        HealthcheckQuery,
+        HealthcheckQueryVariables
+    >
+) {
+    const options = { ...defaultOptions, ...baseOptions };
+    return Apollo.useQuery<HealthcheckQuery, HealthcheckQueryVariables>(
+        HealthcheckDocument,
+        options
+    );
+}
+export function useHealthcheckLazyQuery(
+    baseOptions?: Apollo.LazyQueryHookOptions<
+        HealthcheckQuery,
+        HealthcheckQueryVariables
+    >
+) {
+    const options = { ...defaultOptions, ...baseOptions };
+    return Apollo.useLazyQuery<HealthcheckQuery, HealthcheckQueryVariables>(
+        HealthcheckDocument,
+        options
+    );
+}
+export function useHealthcheckSuspenseQuery(
+    baseOptions?:
+        | Apollo.SkipToken
+        | Apollo.SuspenseQueryHookOptions<
+              HealthcheckQuery,
+              HealthcheckQueryVariables
+          >
+) {
+    const options =
+        baseOptions === Apollo.skipToken
+            ? baseOptions
+            : { ...defaultOptions, ...baseOptions };
+    return Apollo.useSuspenseQuery<HealthcheckQuery, HealthcheckQueryVariables>(
+        HealthcheckDocument,
+        options
+    );
+}
+export type HealthcheckQueryHookResult = ReturnType<typeof useHealthcheckQuery>;
+export type HealthcheckLazyQueryHookResult = ReturnType<
+    typeof useHealthcheckLazyQuery
+>;
+export type HealthcheckSuspenseQueryHookResult = ReturnType<
+    typeof useHealthcheckSuspenseQuery
+>;
+export type HealthcheckQueryResult = Apollo.QueryResult<
+    HealthcheckQuery,
+    HealthcheckQueryVariables
+>;
+export const SendDataDocument = gql`
+    mutation sendData($channelId: String!) {
+  sendData(channelId: $channelId) {
+    ...TestData
+  }
+}
+    ${TestDataFragmentDoc}`;
+export type SendDataMutationFn = Apollo.MutationFunction<
+    SendDataMutation,
+    SendDataMutationVariables
+>;
+
+/**
+ * __useSendDataMutation__
+ *
+ * To run a mutation, you first call `useSendDataMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSendDataMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [sendDataMutation, { data, loading, error }] = useSendDataMutation({
+ *   variables: {
+ *      channelId: // value for 'channelId'
+ *   },
+ * });
+ */
+export function useSendDataMutation(
+    baseOptions?: Apollo.MutationHookOptions<
+        SendDataMutation,
+        SendDataMutationVariables
+    >
+) {
+    const options = { ...defaultOptions, ...baseOptions };
+    return Apollo.useMutation<SendDataMutation, SendDataMutationVariables>(
+        SendDataDocument,
+        options
+    );
+}
+export type SendDataMutationHookResult = ReturnType<typeof useSendDataMutation>;
+export type SendDataMutationResult = Apollo.MutationResult<SendDataMutation>;
+export type SendDataMutationOptions = Apollo.BaseMutationOptions<
+    SendDataMutation,
+    SendDataMutationVariables
+>;
+export const TestSubDocument = gql`
+    subscription testSub($channelId: String!) {
+  testSub(channelId: $channelId)
+}
+    `;
+
+/**
+ * __useTestSubSubscription__
+ *
+ * To run a query within a React component, call `useTestSubSubscription` and pass it any options that fit your needs.
+ * When your component renders, `useTestSubSubscription` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useTestSubSubscription({
+ *   variables: {
+ *      channelId: // value for 'channelId'
+ *   },
+ * });
+ */
+export function useTestSubSubscription(
+    baseOptions: Apollo.SubscriptionHookOptions<
+        TestSubSubscription,
+        TestSubSubscriptionVariables
+    > &
+        (
+            | { variables: TestSubSubscriptionVariables; skip?: boolean }
+            | { skip: boolean }
+        )
+) {
+    const options = { ...defaultOptions, ...baseOptions };
+    return Apollo.useSubscription<
+        TestSubSubscription,
+        TestSubSubscriptionVariables
+    >(TestSubDocument, options);
+}
+export type TestSubSubscriptionHookResult = ReturnType<
+    typeof useTestSubSubscription
+>;
+export type TestSubSubscriptionResult =
+    Apollo.SubscriptionResult<TestSubSubscription>;

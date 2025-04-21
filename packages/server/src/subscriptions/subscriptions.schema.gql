@@ -1,1 +1,9 @@
-type Subscription {}
+type Subscription {
+    listenToGameUpdates(channelId: String!): GameState!
+}
+
+subscription listenToGameUpdates($channelId: String!) {
+    listenToGameUpdates(channelId: $channelId) {
+        ...GameState
+    }
+}

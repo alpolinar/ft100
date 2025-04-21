@@ -1,0 +1,46 @@
+type GameState {
+    id: String!
+    currentTotal: Int!
+    currentPlayerId: String!
+    winnerId: String
+}
+
+type Move {
+    id: String!
+    userId: String!
+    gameId: String!
+    value: Int!
+}
+
+input InputMove {
+    userId: String!
+    gameId: String!
+    value: Int!
+}
+
+fragment GameState on GameState {
+    id
+    currentTotal
+    currentPlayerId
+    winnerId
+}
+
+type Query {
+    fetchGameState(id: String!): GameState!
+}
+
+query fetchGameState($id: String!) {
+    fetchGameState(id: $id) {
+        ...GameState
+    }
+}
+
+type Mutation {
+    sendMove(input: InputMove!): GameState!
+}
+
+mutation sendMove($input: InputMove!) {
+    sendMove(input: $input) {
+        ...GameState
+    }
+}

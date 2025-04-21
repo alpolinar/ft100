@@ -11,6 +11,7 @@
         "clean": "rimraf lib node_modules",
         "build:lib": "pnpm compile:common && pnpm compile:esm",
         "build:lib:dev": "tsc --outDir ./lib/cjs --module CommonJS --incremental",
+        "build:watch": "pnpm build:lib:dev -watch",
         "compile:common": "tsc --outDir ./lib/cjs --module CommonJS",
         "compile:esm": "tsc --outDir ./lib/esm",
         "gt:gen": "graphql-codegen --config codegen.yml && pnpm dlx @biomejs/biome format --write ./src/generated/*"
@@ -25,15 +26,9 @@
     },
     "exports": {
         ".": {
+            "types": "./lib/esm/index.d.ts",
             "import": "./lib/esm/index.js",
             "require": "./lib/cjs/index.js"
-        }
-    },
-    "typesVersions": {
-        "*": {
-            "/": [
-                "lib/esm/index.d.ts"
-            ]
         }
     },
     "files": [

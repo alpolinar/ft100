@@ -48,31 +48,50 @@ export type Scalars = {
     Date: { input: Date; output: Date };
 };
 
-export class Mutation {
-    readonly sendData?: Maybe<TestData>;
+export class GameState {
+    readonly currentPlayerId: Scalars["String"]["output"];
+    readonly currentTotal: Scalars["Int"]["output"];
+    readonly id: Scalars["String"]["output"];
+    readonly winnerId?: Maybe<Scalars["String"]["output"]>;
 }
 
-export type MutationSendDataArgs = {
-    channelId: Scalars["String"]["input"];
+export class InputMove {
+    readonly gameId: Scalars["String"]["input"];
+    readonly userId: Scalars["String"]["input"];
+    readonly value: Scalars["Int"]["input"];
+}
+
+export class Move {
+    readonly gameId: Scalars["String"]["output"];
+    readonly id: Scalars["String"]["output"];
+    readonly userId: Scalars["String"]["output"];
+    readonly value: Scalars["Int"]["output"];
+}
+
+export class Mutation {
+    readonly sendMove: GameState;
+}
+
+export type MutationSendMoveArgs = {
+    input: InputMove;
 };
 
 export class Query {
+    readonly fetchGameState: GameState;
     readonly healthcheck: Scalars["String"]["output"];
 }
 
-export class Subscription {
-    readonly testSub: Scalars["Int"]["output"];
-}
-
-export type SubscriptionTestSubArgs = {
-    channelId: Scalars["String"]["input"];
+export type QueryFetchGameStateArgs = {
+    id: Scalars["String"]["input"];
 };
 
-export class TestData {
-    readonly age: Scalars["Int"]["output"];
-    readonly birthday: Scalars["Date"]["output"];
-    readonly name: Scalars["String"]["output"];
+export class Subscription {
+    readonly listenToGameUpdates: GameState;
 }
+
+export type SubscriptionListenToGameUpdatesArgs = {
+    channelId: Scalars["String"]["input"];
+};
 
 export type ResolverTypeWrapper<T> = T;
 
@@ -183,24 +202,28 @@ export type DirectiveResolverFn<
 export type ResolversTypes = {
     Boolean: ResolverTypeWrapper<Scalars["Boolean"]["output"]>;
     Date: ResolverTypeWrapper<Scalars["Date"]["output"]>;
+    GameState: ResolverTypeWrapper<GameState>;
+    InputMove: InputMove;
     Int: ResolverTypeWrapper<Scalars["Int"]["output"]>;
+    Move: ResolverTypeWrapper<Move>;
     Mutation: ResolverTypeWrapper<{}>;
     Query: ResolverTypeWrapper<{}>;
     String: ResolverTypeWrapper<Scalars["String"]["output"]>;
     Subscription: ResolverTypeWrapper<{}>;
-    TestData: ResolverTypeWrapper<TestData>;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
     Boolean: Scalars["Boolean"]["output"];
     Date: Scalars["Date"]["output"];
+    GameState: GameState;
+    InputMove: InputMove;
     Int: Scalars["Int"]["output"];
+    Move: Move;
     Mutation: {};
     Query: {};
     String: Scalars["String"]["output"];
     Subscription: {};
-    TestData: TestData;
 };
 
 export interface DateScalarConfig
@@ -208,16 +231,48 @@ export interface DateScalarConfig
     name: "Date";
 }
 
+export type GameStateResolvers<
+    ContextType = any,
+    ParentType extends
+        ResolversParentTypes["GameState"] = ResolversParentTypes["GameState"],
+> = {
+    currentPlayerId?: Resolver<
+        ResolversTypes["String"],
+        ParentType,
+        ContextType
+    >;
+    currentTotal?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
+    id?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+    winnerId?: Resolver<
+        Maybe<ResolversTypes["String"]>,
+        ParentType,
+        ContextType
+    >;
+    __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type MoveResolvers<
+    ContextType = any,
+    ParentType extends
+        ResolversParentTypes["Move"] = ResolversParentTypes["Move"],
+> = {
+    gameId?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+    id?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+    userId?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+    value?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
+    __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type MutationResolvers<
     ContextType = any,
     ParentType extends
         ResolversParentTypes["Mutation"] = ResolversParentTypes["Mutation"],
 > = {
-    sendData?: Resolver<
-        Maybe<ResolversTypes["TestData"]>,
+    sendMove?: Resolver<
+        ResolversTypes["GameState"],
         ParentType,
         ContextType,
-        RequireFields<MutationSendDataArgs, "channelId">
+        RequireFields<MutationSendMoveArgs, "input">
     >;
 };
 
@@ -226,6 +281,12 @@ export type QueryResolvers<
     ParentType extends
         ResolversParentTypes["Query"] = ResolversParentTypes["Query"],
 > = {
+    fetchGameState?: Resolver<
+        ResolversTypes["GameState"],
+        ParentType,
+        ContextType,
+        RequireFields<QueryFetchGameStateArgs, "id">
+    >;
     healthcheck?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
 };
 
@@ -234,70 +295,80 @@ export type SubscriptionResolvers<
     ParentType extends
         ResolversParentTypes["Subscription"] = ResolversParentTypes["Subscription"],
 > = {
-    testSub?: SubscriptionResolver<
-        ResolversTypes["Int"],
-        "testSub",
+    listenToGameUpdates?: SubscriptionResolver<
+        ResolversTypes["GameState"],
+        "listenToGameUpdates",
         ParentType,
         ContextType,
-        RequireFields<SubscriptionTestSubArgs, "channelId">
+        RequireFields<SubscriptionListenToGameUpdatesArgs, "channelId">
     >;
-};
-
-export type TestDataResolvers<
-    ContextType = any,
-    ParentType extends
-        ResolversParentTypes["TestData"] = ResolversParentTypes["TestData"],
-> = {
-    age?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
-    birthday?: Resolver<ResolversTypes["Date"], ParentType, ContextType>;
-    name?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
-    __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type Resolvers<ContextType = any> = {
     Date?: GraphQLScalarType;
+    GameState?: GameStateResolvers<ContextType>;
+    Move?: MoveResolvers<ContextType>;
     Mutation?: MutationResolvers<ContextType>;
     Query?: QueryResolvers<ContextType>;
     Subscription?: SubscriptionResolvers<ContextType>;
-    TestData?: TestDataResolvers<ContextType>;
 };
 
 export type HealthcheckQueryVariables = Exact<{ [key: string]: never }>;
 
 export type HealthcheckQuery = { readonly healthcheck: string };
 
-export type SendDataMutationVariables = Exact<{
+export type GameStateFragment = {
+    readonly id: string;
+    readonly currentTotal: number;
+    readonly currentPlayerId: string;
+    readonly winnerId?: string | undefined | null;
+};
+
+export type FetchGameStateQueryVariables = Exact<{
+    id: Scalars["String"]["input"];
+}>;
+
+export type FetchGameStateQuery = {
+    readonly fetchGameState: {
+        readonly id: string;
+        readonly currentTotal: number;
+        readonly currentPlayerId: string;
+        readonly winnerId?: string | undefined | null;
+    };
+};
+
+export type SendMoveMutationVariables = Exact<{
+    input: InputMove;
+}>;
+
+export type SendMoveMutation = {
+    readonly sendMove: {
+        readonly id: string;
+        readonly currentTotal: number;
+        readonly currentPlayerId: string;
+        readonly winnerId?: string | undefined | null;
+    };
+};
+
+export type ListenToGameUpdatesSubscriptionVariables = Exact<{
     channelId: Scalars["String"]["input"];
 }>;
 
-export type SendDataMutation = {
-    readonly sendData?:
-        | {
-              readonly name: string;
-              readonly age: number;
-              readonly birthday: Date;
-          }
-        | undefined
-        | null;
+export type ListenToGameUpdatesSubscription = {
+    readonly listenToGameUpdates: {
+        readonly id: string;
+        readonly currentTotal: number;
+        readonly currentPlayerId: string;
+        readonly winnerId?: string | undefined | null;
+    };
 };
 
-export type TestDataFragment = {
-    readonly name: string;
-    readonly age: number;
-    readonly birthday: Date;
-};
-
-export type TestSubSubscriptionVariables = Exact<{
-    channelId: Scalars["String"]["input"];
-}>;
-
-export type TestSubSubscription = { readonly testSub: number };
-
-export const TestDataFragmentDoc = gql`
-    fragment TestData on TestData {
-  name
-  age
-  birthday
+export const GameStateFragmentDoc = gql`
+    fragment GameState on GameState {
+  id
+  currentTotal
+  currentPlayerId
+  winnerId
 }
     `;
 export const HealthcheckDocument = gql`
@@ -373,93 +444,180 @@ export type HealthcheckQueryResult = Apollo.QueryResult<
     HealthcheckQuery,
     HealthcheckQueryVariables
 >;
-export const SendDataDocument = gql`
-    mutation sendData($channelId: String!) {
-  sendData(channelId: $channelId) {
-    ...TestData
+export const FetchGameStateDocument = gql`
+    query fetchGameState($id: String!) {
+  fetchGameState(id: $id) {
+    ...GameState
   }
 }
-    ${TestDataFragmentDoc}`;
-export type SendDataMutationFn = Apollo.MutationFunction<
-    SendDataMutation,
-    SendDataMutationVariables
+    ${GameStateFragmentDoc}`;
+
+/**
+ * __useFetchGameStateQuery__
+ *
+ * To run a query within a React component, call `useFetchGameStateQuery` and pass it any options that fit your needs.
+ * When your component renders, `useFetchGameStateQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useFetchGameStateQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useFetchGameStateQuery(
+    baseOptions: Apollo.QueryHookOptions<
+        FetchGameStateQuery,
+        FetchGameStateQueryVariables
+    > &
+        (
+            | { variables: FetchGameStateQueryVariables; skip?: boolean }
+            | { skip: boolean }
+        )
+) {
+    const options = { ...defaultOptions, ...baseOptions };
+    return Apollo.useQuery<FetchGameStateQuery, FetchGameStateQueryVariables>(
+        FetchGameStateDocument,
+        options
+    );
+}
+export function useFetchGameStateLazyQuery(
+    baseOptions?: Apollo.LazyQueryHookOptions<
+        FetchGameStateQuery,
+        FetchGameStateQueryVariables
+    >
+) {
+    const options = { ...defaultOptions, ...baseOptions };
+    return Apollo.useLazyQuery<
+        FetchGameStateQuery,
+        FetchGameStateQueryVariables
+    >(FetchGameStateDocument, options);
+}
+export function useFetchGameStateSuspenseQuery(
+    baseOptions?:
+        | Apollo.SkipToken
+        | Apollo.SuspenseQueryHookOptions<
+              FetchGameStateQuery,
+              FetchGameStateQueryVariables
+          >
+) {
+    const options =
+        baseOptions === Apollo.skipToken
+            ? baseOptions
+            : { ...defaultOptions, ...baseOptions };
+    return Apollo.useSuspenseQuery<
+        FetchGameStateQuery,
+        FetchGameStateQueryVariables
+    >(FetchGameStateDocument, options);
+}
+export type FetchGameStateQueryHookResult = ReturnType<
+    typeof useFetchGameStateQuery
+>;
+export type FetchGameStateLazyQueryHookResult = ReturnType<
+    typeof useFetchGameStateLazyQuery
+>;
+export type FetchGameStateSuspenseQueryHookResult = ReturnType<
+    typeof useFetchGameStateSuspenseQuery
+>;
+export type FetchGameStateQueryResult = Apollo.QueryResult<
+    FetchGameStateQuery,
+    FetchGameStateQueryVariables
+>;
+export const SendMoveDocument = gql`
+    mutation sendMove($input: InputMove!) {
+  sendMove(input: $input) {
+    ...GameState
+  }
+}
+    ${GameStateFragmentDoc}`;
+export type SendMoveMutationFn = Apollo.MutationFunction<
+    SendMoveMutation,
+    SendMoveMutationVariables
 >;
 
 /**
- * __useSendDataMutation__
+ * __useSendMoveMutation__
  *
- * To run a mutation, you first call `useSendDataMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useSendDataMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useSendMoveMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSendMoveMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [sendDataMutation, { data, loading, error }] = useSendDataMutation({
+ * const [sendMoveMutation, { data, loading, error }] = useSendMoveMutation({
  *   variables: {
- *      channelId: // value for 'channelId'
+ *      input: // value for 'input'
  *   },
  * });
  */
-export function useSendDataMutation(
+export function useSendMoveMutation(
     baseOptions?: Apollo.MutationHookOptions<
-        SendDataMutation,
-        SendDataMutationVariables
+        SendMoveMutation,
+        SendMoveMutationVariables
     >
 ) {
     const options = { ...defaultOptions, ...baseOptions };
-    return Apollo.useMutation<SendDataMutation, SendDataMutationVariables>(
-        SendDataDocument,
+    return Apollo.useMutation<SendMoveMutation, SendMoveMutationVariables>(
+        SendMoveDocument,
         options
     );
 }
-export type SendDataMutationHookResult = ReturnType<typeof useSendDataMutation>;
-export type SendDataMutationResult = Apollo.MutationResult<SendDataMutation>;
-export type SendDataMutationOptions = Apollo.BaseMutationOptions<
-    SendDataMutation,
-    SendDataMutationVariables
+export type SendMoveMutationHookResult = ReturnType<typeof useSendMoveMutation>;
+export type SendMoveMutationResult = Apollo.MutationResult<SendMoveMutation>;
+export type SendMoveMutationOptions = Apollo.BaseMutationOptions<
+    SendMoveMutation,
+    SendMoveMutationVariables
 >;
-export const TestSubDocument = gql`
-    subscription testSub($channelId: String!) {
-  testSub(channelId: $channelId)
+export const ListenToGameUpdatesDocument = gql`
+    subscription listenToGameUpdates($channelId: String!) {
+  listenToGameUpdates(channelId: $channelId) {
+    ...GameState
+  }
 }
-    `;
+    ${GameStateFragmentDoc}`;
 
 /**
- * __useTestSubSubscription__
+ * __useListenToGameUpdatesSubscription__
  *
- * To run a query within a React component, call `useTestSubSubscription` and pass it any options that fit your needs.
- * When your component renders, `useTestSubSubscription` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useListenToGameUpdatesSubscription` and pass it any options that fit your needs.
+ * When your component renders, `useListenToGameUpdatesSubscription` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useTestSubSubscription({
+ * const { data, loading, error } = useListenToGameUpdatesSubscription({
  *   variables: {
  *      channelId: // value for 'channelId'
  *   },
  * });
  */
-export function useTestSubSubscription(
+export function useListenToGameUpdatesSubscription(
     baseOptions: Apollo.SubscriptionHookOptions<
-        TestSubSubscription,
-        TestSubSubscriptionVariables
+        ListenToGameUpdatesSubscription,
+        ListenToGameUpdatesSubscriptionVariables
     > &
         (
-            | { variables: TestSubSubscriptionVariables; skip?: boolean }
+            | {
+                  variables: ListenToGameUpdatesSubscriptionVariables;
+                  skip?: boolean;
+              }
             | { skip: boolean }
         )
 ) {
     const options = { ...defaultOptions, ...baseOptions };
     return Apollo.useSubscription<
-        TestSubSubscription,
-        TestSubSubscriptionVariables
-    >(TestSubDocument, options);
+        ListenToGameUpdatesSubscription,
+        ListenToGameUpdatesSubscriptionVariables
+    >(ListenToGameUpdatesDocument, options);
 }
-export type TestSubSubscriptionHookResult = ReturnType<
-    typeof useTestSubSubscription
+export type ListenToGameUpdatesSubscriptionHookResult = ReturnType<
+    typeof useListenToGameUpdatesSubscription
 >;
-export type TestSubSubscriptionResult =
-    Apollo.SubscriptionResult<TestSubSubscription>;
+export type ListenToGameUpdatesSubscriptionResult =
+    Apollo.SubscriptionResult<ListenToGameUpdatesSubscription>;

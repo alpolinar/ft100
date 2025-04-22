@@ -1,0 +1,9 @@
+type User {
+    id: String!
+    username: String!
+}
+
+fragment User on User {
+    id
+    username
+}

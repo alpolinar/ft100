@@ -10,6 +10,7 @@
     },
     "dependencies": {
         "@apollo/client": "^3.13.8",
+        "@apollo/client-integration-nextjs": "^0.12.1",
         "@ods/server-lib": "workspace:*",
         "@t3-oss/env-nextjs": "^0.12.0",
         "graphql-ws": "^6.0.4",

@@ -1,7 +1,12 @@
 import { env } from "@/env";
-import { ApolloClient, concat, HttpLink, InMemoryCache } from "@apollo/client";
+import { concat, HttpLink } from "@apollo/client";
 import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
 import { createClient } from "graphql-ws";
+import {
+    ApolloClient,
+    InMemoryCache,
+    registerApolloClient,
+} from "@apollo/client-integration-nextjs";
 
 const getWsServerEndpoint = () => {
     if (env.NEXT_PUBLIC_SERVER_ENDPOINT) {
@@ -41,7 +46,7 @@ const getServerEndpoint = (): string => {
 };
 
 const httpLink = new HttpLink({
-    uri: getServerEndpoint(),
+    uri: `${getServerEndpoint()}/api`,
 });
 
 export const client = new ApolloClient({
@@ -63,4 +68,27 @@ export const client = new ApolloClient({
             errorPolicy: "all",
         },
     },
+});
+
+export const { getClient, query, PreloadQuery } = registerApolloClient(() => {
+    return new ApolloClient({
+        link: httpLink,
+        cache: new InMemoryCache({
+            addTypename: false,
+        }),
+        defaultOptions: {
+            watchQuery: {
+                fetchPolicy: "no-cache",
+                errorPolicy: "ignore",
+            },
+            query: {
+                fetchPolicy: "no-cache",
+                errorPolicy: "all",
+            },
+            mutate: {
+                fetchPolicy: "no-cache",
+                errorPolicy: "all",
+            },
+        },
+    });
 });

@@ -52,6 +52,8 @@ export class GameState {
     readonly currentPlayerId: Scalars["String"]["output"];
     readonly currentTotal: Scalars["Int"]["output"];
     readonly id: Scalars["String"]["output"];
+    readonly player1?: Maybe<User>;
+    readonly player2?: Maybe<User>;
     readonly winnerId?: Maybe<Scalars["String"]["output"]>;
 }
 
@@ -92,6 +94,11 @@ export class Subscription {
 export type SubscriptionListenToGameUpdatesArgs = {
     channelId: Scalars["String"]["input"];
 };
+
+export class User {
+    readonly id: Scalars["String"]["output"];
+    readonly username?: Maybe<Scalars["String"]["output"]>;
+}
 
 export type ResolverTypeWrapper<T> = T;
 
@@ -210,6 +217,7 @@ export type ResolversTypes = {
     Query: ResolverTypeWrapper<{}>;
     String: ResolverTypeWrapper<Scalars["String"]["output"]>;
     Subscription: ResolverTypeWrapper<{}>;
+    User: ResolverTypeWrapper<User>;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -224,6 +232,7 @@ export type ResolversParentTypes = {
     Query: {};
     String: Scalars["String"]["output"];
     Subscription: {};
+    User: User;
 };
 
 export interface DateScalarConfig
@@ -243,6 +252,8 @@ export type GameStateResolvers<
     >;
     currentTotal?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
     id?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+    player1?: Resolver<Maybe<ResolversTypes["User"]>, ParentType, ContextType>;
+    player2?: Resolver<Maybe<ResolversTypes["User"]>, ParentType, ContextType>;
     winnerId?: Resolver<
         Maybe<ResolversTypes["String"]>,
         ParentType,
@@ -304,6 +315,20 @@ export type SubscriptionResolvers<
     >;
 };
 
+export type UserResolvers<
+    ContextType = any,
+    ParentType extends
+        ResolversParentTypes["User"] = ResolversParentTypes["User"],
+> = {
+    id?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+    username?: Resolver<
+        Maybe<ResolversTypes["String"]>,
+        ParentType,
+        ContextType
+    >;
+    __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type Resolvers<ContextType = any> = {
     Date?: GraphQLScalarType;
     GameState?: GameStateResolvers<ContextType>;
@@ -311,6 +336,7 @@ export type Resolvers<ContextType = any> = {
     Mutation?: MutationResolvers<ContextType>;
     Query?: QueryResolvers<ContextType>;
     Subscription?: SubscriptionResolvers<ContextType>;
+    User?: UserResolvers<ContextType>;
 };
 
 export type HealthcheckQueryVariables = Exact<{ [key: string]: never }>;
@@ -322,6 +348,14 @@ export type GameStateFragment = {
     readonly currentTotal: number;
     readonly currentPlayerId: string;
     readonly winnerId?: string | undefined | null;
+    readonly player1?:
+        | { readonly id: string; readonly username?: string | undefined | null }
+        | undefined
+        | null;
+    readonly player2?:
+        | { readonly id: string; readonly username?: string | undefined | null }
+        | undefined
+        | null;
 };
 
 export type FetchGameStateQueryVariables = Exact<{
@@ -334,6 +368,20 @@ export type FetchGameStateQuery = {
         readonly currentTotal: number;
         readonly currentPlayerId: string;
         readonly winnerId?: string | undefined | null;
+        readonly player1?:
+            | {
+                  readonly id: string;
+                  readonly username?: string | undefined | null;
+              }
+            | undefined
+            | null;
+        readonly player2?:
+            | {
+                  readonly id: string;
+                  readonly username?: string | undefined | null;
+              }
+            | undefined
+            | null;
     };
 };
 
@@ -347,6 +395,20 @@ export type SendMoveMutation = {
         readonly currentTotal: number;
         readonly currentPlayerId: string;
         readonly winnerId?: string | undefined | null;
+        readonly player1?:
+            | {
+                  readonly id: string;
+                  readonly username?: string | undefined | null;
+              }
+            | undefined
+            | null;
+        readonly player2?:
+            | {
+                  readonly id: string;
+                  readonly username?: string | undefined | null;
+              }
+            | undefined
+            | null;
     };
 };
 
@@ -360,17 +422,48 @@ export type ListenToGameUpdatesSubscription = {
         readonly currentTotal: number;
         readonly currentPlayerId: string;
         readonly winnerId?: string | undefined | null;
+        readonly player1?:
+            | {
+                  readonly id: string;
+                  readonly username?: string | undefined | null;
+              }
+            | undefined
+            | null;
+        readonly player2?:
+            | {
+                  readonly id: string;
+                  readonly username?: string | undefined | null;
+              }
+            | undefined
+            | null;
     };
 };
 
+export type UserFragment = {
+    readonly id: string;
+    readonly username?: string | undefined | null;
+};
+
+export const UserFragmentDoc = gql`
+    fragment User on User {
+  id
+  username
+}
+    `;
 export const GameStateFragmentDoc = gql`
     fragment GameState on GameState {
   id
   currentTotal
   currentPlayerId
   winnerId
+  player1 {
+    ...User
+  }
+  player2 {
+    ...User
+  }
 }
-    `;
+    ${UserFragmentDoc}`;
 export const HealthcheckDocument = gql`
     query healthcheck {
   healthcheck

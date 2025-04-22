@@ -8,6 +8,11 @@ import { join } from "node:path";
 
 export const envSchema = z.object({
     APP_PORT: z.coerce.number().default(3001),
+    DB_HOST: z.string(),
+    DB_PORT: z.coerce.number().default(5432),
+    DB_USERNAME: z.string(),
+    DB_PASSWORD: z.string(),
+    DB: z.string(),
 });
 
 export const configOptions: ConfigModuleOptions = {

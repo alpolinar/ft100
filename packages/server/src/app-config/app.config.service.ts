@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { z } from "zod";
-import { envSchema } from "./config/environments";
+import { envSchema } from "../config/environments/config.options";
 
 type EnvVariables = z.infer<typeof envSchema>;
 

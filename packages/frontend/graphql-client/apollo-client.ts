@@ -1,5 +1,5 @@
 import { env } from "@/env";
-import { concat, HttpLink } from "@apollo/client";
+import { concat, DefaultOptions, HttpLink } from "@apollo/client";
 import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
 import { createClient } from "graphql-ws";
 import {
@@ -49,25 +49,27 @@ const httpLink = new HttpLink({
     uri: `${getServerEndpoint()}/api`,
 });
 
+const defaultOptions: DefaultOptions = {
+    watchQuery: {
+        fetchPolicy: "no-cache",
+        errorPolicy: "ignore",
+    },
+    query: {
+        fetchPolicy: "no-cache",
+        errorPolicy: "all",
+    },
+    mutate: {
+        fetchPolicy: "no-cache",
+        errorPolicy: "all",
+    },
+};
+
 export const client = new ApolloClient({
     link: wsLink ? concat(wsLink, httpLink) : httpLink,
     cache: new InMemoryCache({
         addTypename: false,
     }),
-    defaultOptions: {
-        watchQuery: {
-            fetchPolicy: "no-cache",
-            errorPolicy: "ignore",
-        },
-        query: {
-            fetchPolicy: "no-cache",
-            errorPolicy: "all",
-        },
-        mutate: {
-            fetchPolicy: "no-cache",
-            errorPolicy: "all",
-        },
-    },
+    defaultOptions,
 });
 
 export const { getClient, query, PreloadQuery } = registerApolloClient(() => {
@@ -76,19 +78,6 @@ export const { getClient, query, PreloadQuery } = registerApolloClient(() => {
         cache: new InMemoryCache({
             addTypename: false,
         }),
-        defaultOptions: {
-            watchQuery: {
-                fetchPolicy: "no-cache",
-                errorPolicy: "ignore",
-            },
-            query: {
-                fetchPolicy: "no-cache",
-                errorPolicy: "all",
-            },
-            mutate: {
-                fetchPolicy: "no-cache",
-                errorPolicy: "all",
-            },
-        },
+        defaultOptions,
     });
 });

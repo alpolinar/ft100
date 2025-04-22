@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+  ft100-postgres:
+    restart: always
+    image: postgres:16.3-alpine
+    container_name: ft100-postgres
+    environment:
+      POSTGRES_PASSWORD: ft100password
+      POSTGRES_USER: ft100user
+      POSTGRES_DB: ft100db
+      POSTGRES_PORT: ${DB_PORT}
+    ports:
+      - ${DB_PORT}:${DB_PORT}
+    networks:
+      - ft100-network
+    volumes:
+      - ft100-postgres:/var/lib/postgresql/data
+
+volumes:
+  ft100-postgres:
+
+networks:
+  ft100-network:
+    driver: bridge

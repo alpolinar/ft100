@@ -7,15 +7,18 @@ export class GameService {
 
     fetchGameState(id: string): GameState {
         const state = this.gameState.get(id);
+
         const game = !state
             ? this.gameState
                   .set(id, {
                       currentPlayerId: "1234",
                       currentTotal: 0,
                       id,
+                      players: [],
                   })
                   .get(id)
             : state;
+
         return game;
     }
 }

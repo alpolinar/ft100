@@ -3,8 +3,7 @@ type GameState {
     currentTotal: Int!
     currentPlayerId: String!
     winnerId: String
-    player1: User
-    player2: User
+    players: [User!]!
 }
 
 type Move {
@@ -25,10 +24,7 @@ fragment GameState on GameState {
     currentTotal
     currentPlayerId
     winnerId
-    player1 {
-        ...User
-    }
-    player2 {
+    players {
         ...User
     }
 }

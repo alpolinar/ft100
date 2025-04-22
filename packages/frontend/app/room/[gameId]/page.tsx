@@ -1,4 +1,4 @@
-import { query } from "@/apollo-client/apollo-client";
+import { query } from "@/graphql-client/apollo-client";
 import {
     FetchGameStateDocument,
     FetchGameStateQuery,

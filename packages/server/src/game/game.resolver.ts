@@ -1,13 +1,14 @@
 import { Args, Query, Resolver } from "@nestjs/graphql";
-import { GameService } from "./game.service";
 import { GameState } from "@ods/server-lib";
+import { Effect } from "effect";
+import { GameService } from "./game.service";
 
 @Resolver()
 export class GameResolver {
     constructor(private readonly gameService: GameService) {}
 
     @Query(() => GameState)
-    fetchGameState(@Args("id") id: string): GameState {
-        return this.gameService.fetchGameState(id);
+    async fetchGameState(@Args("id") id: string): Promise<GameState> {
+        return Effect.runSync(await this.gameService.fetchGameState(id));
     }
 }

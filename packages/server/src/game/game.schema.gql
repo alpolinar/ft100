@@ -1,9 +1,11 @@
 type GameState {
     id: String!
+    gameId: String!
     currentTotal: Int!
-    currentPlayerId: String!
+    currentPlayerId: String
     winnerId: String
-    players: [User!]!
+    playerOne: User
+    playerTwo: User
 }
 
 type Move {
@@ -19,12 +21,33 @@ input InputMove {
     value: Int!
 }
 
+input InputCreateGame {
+    gameId: String!
+    currentTotal: Int
+    currentPlayerId: String
+    winnerId: String
+    fkPlayerOneId: String
+    fkPlayerTwoId: String
+}
+
+input InputUpdateGame {
+    currentTotal: Int
+    currentPlayerId: String
+    winnerId: String
+    fkPlayerOneId: String
+    fkPlayerTwoId: String
+}
+
 fragment GameState on GameState {
     id
+    gameId
     currentTotal
     currentPlayerId
     winnerId
-    players {
+    playerOne {
+        ...User
+    }
+    playerTwo {
         ...User
     }
 }

@@ -49,17 +49,36 @@ export type Scalars = {
 };
 
 export class GameState {
-    readonly currentPlayerId: Scalars["String"]["output"];
+    readonly currentPlayerId?: Maybe<Scalars["String"]["output"]>;
     readonly currentTotal: Scalars["Int"]["output"];
+    readonly gameId: Scalars["String"]["output"];
     readonly id: Scalars["String"]["output"];
-    readonly players: ReadonlyArray<User>;
+    readonly playerOne?: Maybe<User>;
+    readonly playerTwo?: Maybe<User>;
     readonly winnerId?: Maybe<Scalars["String"]["output"]>;
+}
+
+export class InputCreateGame {
+    readonly currentPlayerId?: InputMaybe<Scalars["String"]["input"]>;
+    readonly currentTotal?: InputMaybe<Scalars["Int"]["input"]>;
+    readonly fkPlayerOneId?: InputMaybe<Scalars["String"]["input"]>;
+    readonly fkPlayerTwoId?: InputMaybe<Scalars["String"]["input"]>;
+    readonly gameId: Scalars["String"]["input"];
+    readonly winnerId?: InputMaybe<Scalars["String"]["input"]>;
 }
 
 export class InputMove {
     readonly gameId: Scalars["String"]["input"];
     readonly userId: Scalars["String"]["input"];
     readonly value: Scalars["Int"]["input"];
+}
+
+export class InputUpdateGame {
+    readonly currentPlayerId?: InputMaybe<Scalars["String"]["input"]>;
+    readonly currentTotal?: InputMaybe<Scalars["Int"]["input"]>;
+    readonly fkPlayerOneId?: InputMaybe<Scalars["String"]["input"]>;
+    readonly fkPlayerTwoId?: InputMaybe<Scalars["String"]["input"]>;
+    readonly winnerId?: InputMaybe<Scalars["String"]["input"]>;
 }
 
 export class Move {
@@ -209,7 +228,9 @@ export type ResolversTypes = {
     Boolean: ResolverTypeWrapper<Scalars["Boolean"]["output"]>;
     Date: ResolverTypeWrapper<Scalars["Date"]["output"]>;
     GameState: ResolverTypeWrapper<GameState>;
+    InputCreateGame: InputCreateGame;
     InputMove: InputMove;
+    InputUpdateGame: InputUpdateGame;
     Int: ResolverTypeWrapper<Scalars["Int"]["output"]>;
     Move: ResolverTypeWrapper<Move>;
     Mutation: ResolverTypeWrapper<{}>;
@@ -224,7 +245,9 @@ export type ResolversParentTypes = {
     Boolean: Scalars["Boolean"]["output"];
     Date: Scalars["Date"]["output"];
     GameState: GameState;
+    InputCreateGame: InputCreateGame;
     InputMove: InputMove;
+    InputUpdateGame: InputUpdateGame;
     Int: Scalars["Int"]["output"];
     Move: Move;
     Mutation: {};
@@ -245,14 +268,20 @@ export type GameStateResolvers<
         ResolversParentTypes["GameState"] = ResolversParentTypes["GameState"],
 > = {
     currentPlayerId?: Resolver<
-        ResolversTypes["String"],
+        Maybe<ResolversTypes["String"]>,
         ParentType,
         ContextType
     >;
     currentTotal?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
+    gameId?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
     id?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
-    players?: Resolver<
-        ReadonlyArray<ResolversTypes["User"]>,
+    playerOne?: Resolver<
+        Maybe<ResolversTypes["User"]>,
+        ParentType,
+        ContextType
+    >;
+    playerTwo?: Resolver<
+        Maybe<ResolversTypes["User"]>,
         ParentType,
         ContextType
     >;
@@ -343,13 +372,18 @@ export type HealthcheckQuery = { readonly healthcheck: string };
 
 export type GameStateFragment = {
     readonly id: string;
+    readonly gameId: string;
     readonly currentTotal: number;
-    readonly currentPlayerId: string;
+    readonly currentPlayerId?: string | undefined | null;
     readonly winnerId?: string | undefined | null;
-    readonly players: ReadonlyArray<{
-        readonly id: string;
-        readonly username: string;
-    }>;
+    readonly playerOne?:
+        | { readonly id: string; readonly username: string }
+        | undefined
+        | null;
+    readonly playerTwo?:
+        | { readonly id: string; readonly username: string }
+        | undefined
+        | null;
 };
 
 export type FetchGameStateQueryVariables = Exact<{
@@ -359,13 +393,18 @@ export type FetchGameStateQueryVariables = Exact<{
 export type FetchGameStateQuery = {
     readonly fetchGameState: {
         readonly id: string;
+        readonly gameId: string;
         readonly currentTotal: number;
-        readonly currentPlayerId: string;
+        readonly currentPlayerId?: string | undefined | null;
         readonly winnerId?: string | undefined | null;
-        readonly players: ReadonlyArray<{
-            readonly id: string;
-            readonly username: string;
-        }>;
+        readonly playerOne?:
+            | { readonly id: string; readonly username: string }
+            | undefined
+            | null;
+        readonly playerTwo?:
+            | { readonly id: string; readonly username: string }
+            | undefined
+            | null;
     };
 };
 
@@ -376,13 +415,18 @@ export type SendMoveMutationVariables = Exact<{
 export type SendMoveMutation = {
     readonly sendMove: {
         readonly id: string;
+        readonly gameId: string;
         readonly currentTotal: number;
-        readonly currentPlayerId: string;
+        readonly currentPlayerId?: string | undefined | null;
         readonly winnerId?: string | undefined | null;
-        readonly players: ReadonlyArray<{
-            readonly id: string;
-            readonly username: string;
-        }>;
+        readonly playerOne?:
+            | { readonly id: string; readonly username: string }
+            | undefined
+            | null;
+        readonly playerTwo?:
+            | { readonly id: string; readonly username: string }
+            | undefined
+            | null;
     };
 };
 
@@ -393,13 +437,18 @@ export type ListenToGameUpdatesSubscriptionVariables = Exact<{
 export type ListenToGameUpdatesSubscription = {
     readonly listenToGameUpdates: {
         readonly id: string;
+        readonly gameId: string;
         readonly currentTotal: number;
-        readonly currentPlayerId: string;
+        readonly currentPlayerId?: string | undefined | null;
         readonly winnerId?: string | undefined | null;
-        readonly players: ReadonlyArray<{
-            readonly id: string;
-            readonly username: string;
-        }>;
+        readonly playerOne?:
+            | { readonly id: string; readonly username: string }
+            | undefined
+            | null;
+        readonly playerTwo?:
+            | { readonly id: string; readonly username: string }
+            | undefined
+            | null;
     };
 };
 
@@ -414,10 +463,14 @@ export const UserFragmentDoc = gql`
 export const GameStateFragmentDoc = gql`
     fragment GameState on GameState {
   id
+  gameId
   currentTotal
   currentPlayerId
   winnerId
-  players {
+  playerOne {
+    ...User
+  }
+  playerTwo {
     ...User
   }
 }

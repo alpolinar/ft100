@@ -5,9 +5,9 @@ import {
     FetchGameStateQueryVariables,
 } from "@ods/server-lib";
 
-export default async function GamePage({
-    params,
-}: { params: Promise<{ gameId: string }> }) {
+type GamePageProps = Readonly<{ params: Promise<{ gameId: string }> }>;
+
+export default async function GamePage({ params }: GamePageProps) {
     const { gameId } = await params;
 
     const { data } = await query<

@@ -7,7 +7,7 @@ import {
 
 type GamePageProps = Readonly<{ params: Promise<{ gameId: string }> }>;
 
-export default async function GamePage({ params }: GamePageProps) {
+const RoomPage = async ({ params }: GamePageProps) => {
     const { gameId } = await params;
 
     const { data } = await query<
@@ -23,4 +23,6 @@ export default async function GamePage({ params }: GamePageProps) {
     console.log("data", data);
 
     return <div>{gameId}</div>;
-}
+};
+
+export default RoomPage;

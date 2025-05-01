@@ -1,4 +1,4 @@
-export default function RoomLayout({ children }: React.PropsWithChildren) {
+const RoomLayout = ({ children }: React.PropsWithChildren) => {
     return (
         <div>
             header
@@ -7,4 +7,6 @@ export default function RoomLayout({ children }: React.PropsWithChildren) {
             <div>{children}</div>
         </div>
     );
-}
+};
+
+export default RoomLayout;

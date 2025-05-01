@@ -7,7 +7,7 @@ import { GameService } from "./game.service";
 export class GameResolver {
     constructor(private readonly gameService: GameService) {}
 
-    @Query(() => GameState)
+    @Query("fetchGameState")
     async fetchGameState(@Args("id") id: string): Promise<GameState> {
         return Effect.runPromise(this.gameService.fetchGameState(id));
     }

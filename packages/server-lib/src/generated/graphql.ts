@@ -48,7 +48,7 @@ export type Scalars = {
     Date: { input: Date; output: Date };
 };
 
-export class GameState {
+export type GameState = {
     readonly currentPlayerId?: Maybe<Scalars["String"]["output"]>;
     readonly currentTotal: Scalars["Int"]["output"];
     readonly gameId: Scalars["String"]["output"];
@@ -56,67 +56,67 @@ export class GameState {
     readonly playerOne?: Maybe<User>;
     readonly playerTwo?: Maybe<User>;
     readonly winnerId?: Maybe<Scalars["String"]["output"]>;
-}
+};
 
-export class InputCreateGame {
+export type InputCreateGame = {
     readonly currentPlayerId?: InputMaybe<Scalars["String"]["input"]>;
     readonly currentTotal?: InputMaybe<Scalars["Int"]["input"]>;
     readonly fkPlayerOneId?: InputMaybe<Scalars["String"]["input"]>;
     readonly fkPlayerTwoId?: InputMaybe<Scalars["String"]["input"]>;
     readonly gameId: Scalars["String"]["input"];
     readonly winnerId?: InputMaybe<Scalars["String"]["input"]>;
-}
+};
 
-export class InputMove {
+export type InputMove = {
     readonly gameId: Scalars["String"]["input"];
     readonly userId: Scalars["String"]["input"];
     readonly value: Scalars["Int"]["input"];
-}
+};
 
-export class InputUpdateGame {
+export type InputUpdateGame = {
     readonly currentPlayerId?: InputMaybe<Scalars["String"]["input"]>;
     readonly currentTotal?: InputMaybe<Scalars["Int"]["input"]>;
     readonly fkPlayerOneId?: InputMaybe<Scalars["String"]["input"]>;
     readonly fkPlayerTwoId?: InputMaybe<Scalars["String"]["input"]>;
     readonly winnerId?: InputMaybe<Scalars["String"]["input"]>;
-}
+};
 
-export class Move {
+export type Move = {
     readonly gameId: Scalars["String"]["output"];
     readonly id: Scalars["String"]["output"];
     readonly userId: Scalars["String"]["output"];
     readonly value: Scalars["Int"]["output"];
-}
+};
 
-export class Mutation {
+export type Mutation = {
     readonly sendMove: GameState;
-}
+};
 
 export type MutationSendMoveArgs = {
     input: InputMove;
 };
 
-export class Query {
+export type Query = {
     readonly fetchGameState: GameState;
     readonly healthcheck: Scalars["String"]["output"];
-}
+};
 
 export type QueryFetchGameStateArgs = {
     id: Scalars["String"]["input"];
 };
 
-export class Subscription {
+export type Subscription = {
     readonly listenToGameUpdates: GameState;
-}
+};
 
 export type SubscriptionListenToGameUpdatesArgs = {
     channelId: Scalars["String"]["input"];
 };
 
-export class User {
+export type User = {
     readonly id: Scalars["String"]["output"];
     readonly username: Scalars["String"]["output"];
-}
+};
 
 export type ResolverTypeWrapper<T> = T;
 

@@ -1,4 +1,5 @@
 import { query } from "@/graphql-client/apollo-client";
+import { GameContainer } from "@/room/components/GameContainer";
 import {
     FetchGameStateDocument,
     FetchGameStateQuery,
@@ -22,7 +23,7 @@ const RoomPage = async ({ params }: GamePageProps) => {
 
     console.log("data", data);
 
-    return <div>{gameId}</div>;
+    return <GameContainer data={data.fetchGameState} />;
 };
 
 export default RoomPage;

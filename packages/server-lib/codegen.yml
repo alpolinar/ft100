@@ -11,8 +11,8 @@ config:
     Upload: any
     Any: any
   declarationKind:
-    type: "class"
-    input: "class"
+    type: "type"
+    input: "type"
     interface: "class"
   maybeValue: T | undefined | null
   namingConvention:

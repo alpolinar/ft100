@@ -21,8 +21,6 @@ const RoomPage = async ({ params }: GamePageProps) => {
         },
     });
 
-    console.log("data", data);
-
     return <GameContainer data={data.fetchGameState} />;
 };
 

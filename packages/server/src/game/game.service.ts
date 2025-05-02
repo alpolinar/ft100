@@ -1,10 +1,12 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 import { GameState, InputCreateGame } from "@ods/server-lib";
 import { Effect, Option, pipe } from "effect";
 import { GameDataAccessLayer, GameFilterOptions } from "./game.dal";
 
 @Injectable()
 export class GameService {
+    private readonly logger = new Logger("GameService");
+
     constructor(
         @Inject(GameDataAccessLayer)
         private readonly gameDal: GameDataAccessLayer
@@ -22,15 +24,15 @@ export class GameService {
                     gameId,
                 },
             }),
-            Effect.flatMap((data) => {
-                return pipe(
-                    data,
-                    Option.match({
-                        onNone: () => this.createGame({ gameId }),
-                        onSome: (data) => Effect.succeed(data),
-                    })
-                );
-            })
+            Effect.flatMap(
+                Option.match({
+                    onNone: () => {
+                        this.logger.error("No Game State Found!");
+                        return Effect.fail(new Error("No Game State Found!"));
+                    },
+                    onSome: Effect.succeed,
+                })
+            )
         );
     }
 

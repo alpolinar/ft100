@@ -1,6 +1,6 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 import { GameState } from "@ods/server-lib";
-import { Effect, Option, pipe } from "effect";
+import { Effect, Option, flow, pipe } from "effect";
 import { FilterOptions } from "../utils/type-helpers";
 import {
     GameAttributes,
@@ -14,6 +14,8 @@ export type GameFilterOptions = FilterOptions<GameAttributes>;
 
 @Injectable()
 export class GameDataAccessLayer {
+    private readonly logger = new Logger("GameService");
+
     constructor(
         @Inject(GameProvider)
         private readonly gameRepository: typeof GameEntity
@@ -26,11 +28,16 @@ export class GameDataAccessLayer {
         return pipe(
             Effect.tryPromise({
                 try: () => this.gameRepository.findByPk(id, options),
-                catch: (e) => (e instanceof Error ? e : new Error(String(e))),
+                catch: (e) => {
+                    const err = e instanceof Error ? e : new Error(String(e));
+                    this.logger.error(
+                        `No Game State Found with ID: ${id}. Error: ${err.message}`
+                    );
+                    return err;
+                },
             }),
-            Effect.map((data) =>
-                pipe(
-                    data,
+            Effect.map(
+                flow(
                     Option.fromNullable,
                     Option.map((e) => e.convertToGameState)
                 )
@@ -44,11 +51,16 @@ export class GameDataAccessLayer {
         return pipe(
             Effect.tryPromise({
                 try: () => this.gameRepository.findOne(options),
-                catch: (e) => (e instanceof Error ? e : new Error(String(e))),
+                catch: (e) => {
+                    const err = e instanceof Error ? e : new Error(String(e));
+                    this.logger.error(
+                        `No Game State Found. Error: ${err.message}`
+                    );
+                    return err;
+                },
             }),
-            Effect.map((data) =>
-                pipe(
-                    data,
+            Effect.map(
+                flow(
                     Option.fromNullable,
                     Option.map((e) => e.convertToGameState)
                 )
@@ -62,9 +74,15 @@ export class GameDataAccessLayer {
         return pipe(
             Effect.tryPromise({
                 try: () => this.gameRepository.create(values),
-                catch: (e) => (e instanceof Error ? e : new Error(String(e))),
+                catch: (e) => {
+                    const err = e instanceof Error ? e : new Error(String(e));
+                    this.logger.error(
+                        `Failed to create game. Error: ${err.message}`
+                    );
+                    return err;
+                },
             }),
-            Effect.map((data) => data.convertToGameState)
+            Effect.map((e) => e.convertToGameState)
         );
     }
 
@@ -75,15 +93,23 @@ export class GameDataAccessLayer {
         return pipe(
             Effect.tryPromise({
                 try: () => this.gameRepository.findByPk(values.id, options),
-                catch: (e) => (e instanceof Error ? e : new Error(String(e))),
+                catch: (e) => {
+                    const err = e instanceof Error ? e : new Error(String(e));
+                    this.logger.error(
+                        `No Game State Found. Error: ${err.message}`
+                    );
+                    return err;
+                },
             }),
-            Effect.flatMap((data) => {
-                return pipe(
-                    data,
+            Effect.flatMap(
+                flow(
                     Option.fromNullable,
                     Option.match({
-                        onNone: () =>
-                            Effect.fail(new Error("No Game State Found")),
+                        onNone: () => {
+                            const err = new Error("No Game State Found!");
+                            this.logger.error(err.message);
+                            return Effect.fail(err);
+                        },
                         onSome: (e) =>
                             Effect.gen(function* () {
                                 yield* Effect.promise(() =>
@@ -103,8 +129,8 @@ export class GameDataAccessLayer {
                                 return e.convertToGameState;
                             }),
                     })
-                );
-            })
+                )
+            )
         );
     }
 }

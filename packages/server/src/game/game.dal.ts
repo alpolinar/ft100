@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { GameState } from "@ods/server-lib";
 import { Effect, Option, pipe } from "effect";
 import { FilterOptions } from "../utils/type-helpers";
@@ -68,38 +68,40 @@ export class GameDataAccessLayer {
         );
     }
 
-    update(values: GameUpdateAttributes, options?: GameFilterOptions) {
+    update(
+        values: GameUpdateAttributes,
+        options?: GameFilterOptions
+    ): Effect.Effect<GameState, Error> {
         return pipe(
             Effect.tryPromise({
                 try: () => this.gameRepository.findByPk(values.id, options),
                 catch: (e) => (e instanceof Error ? e : new Error(String(e))),
             }),
-            Effect.map((data) => {
+            Effect.flatMap((data) => {
                 return pipe(
                     data,
                     Option.fromNullable,
                     Option.match({
-                        onNone: () => Option.none(),
-                        onSome: (e) => {
-                            const updateData = Effect.promise(() =>
-                                e.update({
-                                    currentPlayerId: values.currentPlayerId,
-                                    currentTotal: values.currentTotal,
-                                    fkPlayerOneId: values.fkPlayerOneId,
-                                    fkPlayerTwoId: values.fkPlayerTwoId,
-                                    winnerId: values.winnerId,
-                                })
-                            );
+                        onNone: () =>
+                            Effect.fail(new Error("No Game State Found")),
+                        onSome: (e) =>
+                            Effect.gen(function* () {
+                                yield* Effect.promise(() =>
+                                    e.update({
+                                        currentPlayerId: values.currentPlayerId,
+                                        currentTotal: values.currentTotal,
+                                        fkPlayerOneId: values.fkPlayerOneId,
+                                        fkPlayerTwoId: values.fkPlayerTwoId,
+                                        winnerId: values.winnerId,
+                                    })
+                                );
 
-                            const reloadData = Effect.promise(() =>
-                                e.reload({ useMaster: true })
-                            );
+                                yield* Effect.promise(() =>
+                                    e.reload({ useMaster: true })
+                                );
 
-                            Effect.runPromise(updateData);
-                            Effect.runPromise(reloadData);
-
-                            return Option.some(e.convertToGameState);
-                        },
+                                return e.convertToGameState;
+                            }),
                     })
                 );
             })

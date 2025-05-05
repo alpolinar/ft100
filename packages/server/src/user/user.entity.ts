@@ -8,40 +8,40 @@ import {
     Table,
     UpdatedAt,
 } from "sequelize-typescript";
-import { convertToGameState } from "./convert";
+import { convertToUser } from "./convert";
 
-export const GameProvider = "GAME_PROVIDER" as const;
+export const UserProvider = "USER_PROVIDER" as const;
 
-export type GameAttributes = Readonly<{
+export type UserAttributes = Readonly<{
     id: string;
-    gameId: string;
-    currentTotal: number;
-    currentPlayerId?: string | null;
-    winnerId?: string | null;
-    fkPlayerOneId?: string | null;
-    fkPlayerTwoId?: string | null;
+    username: string;
+    email?: string | null;
+    verified: boolean;
+    token?: string | null;
+    img?: string | null;
+    lastLoginAt?: Date | null;
     createdAt: Date;
     updatedAt: Date;
     deletedAt?: Date | null;
 }>;
 
-export type GameCreateAttributes = Omit<
-    GameAttributes,
+export type UserCreateAttributes = Omit<
+    UserAttributes,
     "id" | "createdAt" | "updatedAt" | "deletedAt"
 >;
 
 export type GameUpdateAttributes = Omit<
-    GameAttributes,
+    UserAttributes,
     "createdAt" | "updatedAt" | "deletedAt"
 >;
 
 @Table({
-    tableName: "game",
+    tableName: "user",
     paranoid: true,
     timestamps: true,
     underscored: true,
 })
-export class GameEntity extends Model<GameAttributes, GameCreateAttributes> {
+export class UserEntity extends Model<UserAttributes, UserCreateAttributes> {
     @Column({
         type: DataType.UUID,
         primaryKey: true,
@@ -53,46 +53,48 @@ export class GameEntity extends Model<GameAttributes, GameCreateAttributes> {
 
     @Column({
         type: DataType.STRING,
-        field: "game_id",
-        allowNull: false,
+        unique: true,
+        field: "username",
+        defaultValue: Sequelize.literal(
+            `'user_' || encode(gen_random_bytes(4), 'hex')`
+        ),
     })
-    readonly gameId: string;
+    readonly username: string;
 
     @Column({
-        type: DataType.INTEGER,
-        field: "current_total",
-        defaultValue: 0,
-        allowNull: false,
-    })
-    readonly currentTotal: number;
-
-    @Column({
-        type: DataType.UUID,
-        field: "current_player_id",
+        type: DataType.STRING,
+        field: "email",
         allowNull: true,
     })
-    readonly currentPlayerId?: string;
+    readonly email?: string;
 
     @Column({
-        type: DataType.UUID,
-        field: "winner_id",
-        allowNull: true,
+        type: DataType.BOOLEAN,
+        field: "verified",
+        defaultValue: false,
     })
-    readonly winnerId?: string;
+    readonly veified: boolean;
 
     @Column({
-        type: DataType.UUID,
-        field: "fk_player_one_id",
+        type: DataType.STRING,
+        field: "token",
         allowNull: true,
     })
-    readonly fkPlayerOneId?: string;
+    readonly token?: string;
 
     @Column({
-        type: DataType.UUID,
-        field: "fk_player_two_id",
+        type: DataType.STRING,
+        field: "img",
         allowNull: true,
     })
-    readonly fkPlayerTwoId?: string;
+    readonly img?: string;
+
+    @Column({
+        type: DataType.DATE,
+        field: "last_login_at",
+        allowNull: true,
+    })
+    readonly lastLoginAt?: Date;
 
     @CreatedAt
     @Column({ type: DataType.DATE, field: "created_at", allowNull: false })
@@ -106,7 +108,7 @@ export class GameEntity extends Model<GameAttributes, GameCreateAttributes> {
     @Column({ type: DataType.DATE, field: "deleted_at" })
     readonly deletedAt?: Date;
 
-    get convertToGameState() {
-        return convertToGameState(this);
+    get convertToUser() {
+        return convertToUser(this);
     }
 }

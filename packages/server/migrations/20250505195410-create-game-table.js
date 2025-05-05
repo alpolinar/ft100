@@ -27,14 +27,35 @@ module.exports = {
             winner_id: {
                 allowNull: true,
                 type: Sequelize.UUID,
+                references: {
+                    model: {
+                        tableName: "user",
+                        schema: "public",
+                    },
+                    key: "id",
+                },
             },
             fk_player_one_id: {
                 allowNull: true,
                 type: Sequelize.UUID,
+                references: {
+                    model: {
+                        tableName: "user",
+                        schema: "public",
+                    },
+                    key: "id",
+                },
             },
             fk_player_two_id: {
                 allowNull: true,
                 type: Sequelize.UUID,
+                references: {
+                    model: {
+                        tableName: "user",
+                        schema: "public",
+                    },
+                    key: "id",
+                },
             },
             created_at: {
                 allowNull: false,

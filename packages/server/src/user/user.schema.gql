@@ -3,10 +3,16 @@ type User {
     username: String!
     email: String
     verified: Boolean!
-    lastLoginAt: Date!
+    token: String
+    img: String
+    lastLoginAt: Date
 }
 
 fragment User on User {
     id
     username
+    email
+    verified
+    img
+    lastLoginAt
 }

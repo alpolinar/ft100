@@ -9,12 +9,13 @@ import {
     GameProvider,
     GameUpdateAttributes,
 } from "./game.entity";
+import { catchError } from "../common/utils/helpers";
 
 export type GameFilterOptions = FilterOptions<GameAttributes>;
 
 @Injectable()
 export class GameDataAccessLayer {
-    private readonly logger = new Logger("GameService");
+    private readonly logger = new Logger("GameDataAccessLayer");
 
     constructor(
         @Inject(GameProvider)
@@ -28,13 +29,11 @@ export class GameDataAccessLayer {
         return pipe(
             Effect.tryPromise({
                 try: () => this.gameRepository.findByPk(id, options),
-                catch: (e) => {
-                    const err = e instanceof Error ? e : new Error(String(e));
+                catch: catchError((err) => {
                     this.logger.error(
                         `No Game State Found with ID: ${id}. Error: ${err.message}`
                     );
-                    return err;
-                },
+                }),
             }),
             Effect.map(
                 flow(
@@ -51,13 +50,11 @@ export class GameDataAccessLayer {
         return pipe(
             Effect.tryPromise({
                 try: () => this.gameRepository.findOne(options),
-                catch: (e) => {
-                    const err = e instanceof Error ? e : new Error(String(e));
+                catch: catchError((err) => {
                     this.logger.error(
                         `No Game State Found. Error: ${err.message}`
                     );
-                    return err;
-                },
+                }),
             }),
             Effect.map(
                 flow(
@@ -74,13 +71,11 @@ export class GameDataAccessLayer {
         return pipe(
             Effect.tryPromise({
                 try: () => this.gameRepository.create(values),
-                catch: (e) => {
-                    const err = e instanceof Error ? e : new Error(String(e));
+                catch: catchError((err) => {
                     this.logger.error(
                         `Failed to create game. Error: ${err.message}`
                     );
-                    return err;
-                },
+                }),
             }),
             Effect.map((e) => e.convertToGameState)
         );
@@ -93,13 +88,11 @@ export class GameDataAccessLayer {
         return pipe(
             Effect.tryPromise({
                 try: () => this.gameRepository.findByPk(values.id, options),
-                catch: (e) => {
-                    const err = e instanceof Error ? e : new Error(String(e));
+                catch: catchError((err) => {
                     this.logger.error(
                         `No Game State Found. Error: ${err.message}`
                     );
-                    return err;
-                },
+                }),
             }),
             Effect.flatMap(
                 flow(

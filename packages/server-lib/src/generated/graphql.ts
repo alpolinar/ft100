@@ -114,8 +114,13 @@ export type SubscriptionListenToGameUpdatesArgs = {
 };
 
 export type User = {
+    readonly email?: Maybe<Scalars["String"]["output"]>;
     readonly id: Scalars["String"]["output"];
+    readonly img?: Maybe<Scalars["String"]["output"]>;
+    readonly lastLoginAt?: Maybe<Scalars["Date"]["output"]>;
+    readonly token?: Maybe<Scalars["String"]["output"]>;
     readonly username: Scalars["String"]["output"];
+    readonly verified: Scalars["Boolean"]["output"];
 };
 
 export type ResolverTypeWrapper<T> = T;
@@ -351,8 +356,17 @@ export type UserResolvers<
     ParentType extends
         ResolversParentTypes["User"] = ResolversParentTypes["User"],
 > = {
+    email?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
     id?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+    img?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
+    lastLoginAt?: Resolver<
+        Maybe<ResolversTypes["Date"]>,
+        ParentType,
+        ContextType
+    >;
+    token?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
     username?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+    verified?: Resolver<ResolversTypes["Boolean"], ParentType, ContextType>;
     __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -377,11 +391,25 @@ export type GameStateFragment = {
     readonly currentPlayerId?: string | undefined | null;
     readonly winnerId?: string | undefined | null;
     readonly playerOne?:
-        | { readonly id: string; readonly username: string }
+        | {
+              readonly id: string;
+              readonly username: string;
+              readonly email?: string | undefined | null;
+              readonly verified: boolean;
+              readonly img?: string | undefined | null;
+              readonly lastLoginAt?: Date | undefined | null;
+          }
         | undefined
         | null;
     readonly playerTwo?:
-        | { readonly id: string; readonly username: string }
+        | {
+              readonly id: string;
+              readonly username: string;
+              readonly email?: string | undefined | null;
+              readonly verified: boolean;
+              readonly img?: string | undefined | null;
+              readonly lastLoginAt?: Date | undefined | null;
+          }
         | undefined
         | null;
 };
@@ -398,11 +426,25 @@ export type FetchGameStateQuery = {
         readonly currentPlayerId?: string | undefined | null;
         readonly winnerId?: string | undefined | null;
         readonly playerOne?:
-            | { readonly id: string; readonly username: string }
+            | {
+                  readonly id: string;
+                  readonly username: string;
+                  readonly email?: string | undefined | null;
+                  readonly verified: boolean;
+                  readonly img?: string | undefined | null;
+                  readonly lastLoginAt?: Date | undefined | null;
+              }
             | undefined
             | null;
         readonly playerTwo?:
-            | { readonly id: string; readonly username: string }
+            | {
+                  readonly id: string;
+                  readonly username: string;
+                  readonly email?: string | undefined | null;
+                  readonly verified: boolean;
+                  readonly img?: string | undefined | null;
+                  readonly lastLoginAt?: Date | undefined | null;
+              }
             | undefined
             | null;
     };
@@ -420,11 +462,25 @@ export type SendMoveMutation = {
         readonly currentPlayerId?: string | undefined | null;
         readonly winnerId?: string | undefined | null;
         readonly playerOne?:
-            | { readonly id: string; readonly username: string }
+            | {
+                  readonly id: string;
+                  readonly username: string;
+                  readonly email?: string | undefined | null;
+                  readonly verified: boolean;
+                  readonly img?: string | undefined | null;
+                  readonly lastLoginAt?: Date | undefined | null;
+              }
             | undefined
             | null;
         readonly playerTwo?:
-            | { readonly id: string; readonly username: string }
+            | {
+                  readonly id: string;
+                  readonly username: string;
+                  readonly email?: string | undefined | null;
+                  readonly verified: boolean;
+                  readonly img?: string | undefined | null;
+                  readonly lastLoginAt?: Date | undefined | null;
+              }
             | undefined
             | null;
     };
@@ -442,22 +498,47 @@ export type ListenToGameUpdatesSubscription = {
         readonly currentPlayerId?: string | undefined | null;
         readonly winnerId?: string | undefined | null;
         readonly playerOne?:
-            | { readonly id: string; readonly username: string }
+            | {
+                  readonly id: string;
+                  readonly username: string;
+                  readonly email?: string | undefined | null;
+                  readonly verified: boolean;
+                  readonly img?: string | undefined | null;
+                  readonly lastLoginAt?: Date | undefined | null;
+              }
             | undefined
             | null;
         readonly playerTwo?:
-            | { readonly id: string; readonly username: string }
+            | {
+                  readonly id: string;
+                  readonly username: string;
+                  readonly email?: string | undefined | null;
+                  readonly verified: boolean;
+                  readonly img?: string | undefined | null;
+                  readonly lastLoginAt?: Date | undefined | null;
+              }
             | undefined
             | null;
     };
 };
 
-export type UserFragment = { readonly id: string; readonly username: string };
+export type UserFragment = {
+    readonly id: string;
+    readonly username: string;
+    readonly email?: string | undefined | null;
+    readonly verified: boolean;
+    readonly img?: string | undefined | null;
+    readonly lastLoginAt?: Date | undefined | null;
+};
 
 export const UserFragmentDoc = gql`
     fragment User on User {
   id
   username
+  email
+  verified
+  img
+  lastLoginAt
 }
     `;
 export const GameStateFragmentDoc = gql`

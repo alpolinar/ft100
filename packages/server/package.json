@@ -55,6 +55,7 @@
         "sequelize": "^6.37.7",
         "sequelize-typescript": "^2.1.6",
         "ts-morph": "^25.0.1",
+        "ts-pattern": "^5.7.0",
         "zod": "^3.24.3"
     },
     "devDependencies": {

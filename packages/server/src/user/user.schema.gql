@@ -1,6 +1,9 @@
 type User {
     id: String!
     username: String!
+    email: String
+    verified: Boolean!
+    lastLoginAt: Date!
 }
 
 fragment User on User {

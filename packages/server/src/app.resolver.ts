@@ -1,5 +1,6 @@
 import { Query, Resolver } from "@nestjs/graphql";
 import { AppService } from "./app.service";
+import pkg from "../package.json";
 
 @Resolver()
 export class AppResolver {
@@ -7,6 +8,6 @@ export class AppResolver {
 
     @Query(() => String)
     healthcheck() {
-        return "Hello World!";
+        return `${pkg.name}: ${pkg.version}`;
     }
 }

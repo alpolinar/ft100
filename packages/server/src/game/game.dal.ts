@@ -1,7 +1,7 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import { GameState } from "@ods/server-lib";
 import { Effect, Option, flow, pipe } from "effect";
-import { FilterOptions } from "../utils/type-helpers";
+import { FilterOptions } from "../common/utils/type-helpers";
 import {
     GameAttributes,
     GameCreateAttributes,

@@ -13,6 +13,7 @@ export const envSchema = z.object({
     DB_USERNAME: z.string(),
     DB_PASSWORD: z.string(),
     DB: z.string(),
+    npm_package_version: z.string(),
 });
 
 export const configOptions: ConfigModuleOptions = {

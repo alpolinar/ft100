@@ -177,6 +177,9 @@ importers:
       ts-morph:
         specifier: ^25.0.1
         version: 25.0.1
+      ts-pattern:
+        specifier: ^5.7.0
+        version: 5.7.0
       zod:
         specifier: ^3.24.3
         version: 3.24.3
@@ -4880,6 +4883,9 @@ packages:
         optional: true
       '@swc/wasm':
         optional: true
+
+  ts-pattern@5.7.0:
+    resolution: {integrity: sha512-0/FvIG4g3kNkYgbNwBBW5pZBkfpeYQnH+2AA3xmjkCAit/DSDPKmgwC3fKof4oYUq6gupClVOJlFl+939VRBMg==}
 
   tsconfig-paths-webpack-plugin@4.2.0:
     resolution: {integrity: sha512-zbem3rfRS8BgeNK50Zz5SIQgXzLafiHjOwUAvk/38/o1jHn/V5QAgVUcz884or7WYcPaH3N2CIfUc2u0ul7UcA==}
@@ -10572,6 +10578,8 @@ snapshots:
       yn: 3.1.1
     optionalDependencies:
       '@swc/core': 1.11.21
+
+  ts-pattern@5.7.0: {}
 
   tsconfig-paths-webpack-plugin@4.2.0:
     dependencies:

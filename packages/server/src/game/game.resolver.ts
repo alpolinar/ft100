@@ -9,6 +9,6 @@ export class GameResolver {
 
     @Query("fetchGameState")
     async fetchGameState(@Args("id") id: string): Promise<GameState> {
-        return Effect.runPromise(this.gameService.fetchGameState(id));
+        return await Effect.runPromise(this.gameService.fetchGameState(id));
     }
 }

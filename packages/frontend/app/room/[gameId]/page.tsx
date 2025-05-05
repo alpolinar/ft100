@@ -1,4 +1,4 @@
-import { query } from "@/graphql-client/apollo-client";
+import { query } from "@/graphql-client/ssr-client";
 import { GameContainer } from "@/room/components/GameContainer";
 import {
     FetchGameStateDocument,
@@ -21,7 +21,11 @@ const RoomPage = async ({ params }: GamePageProps) => {
         },
     });
 
-    return <GameContainer data={data.fetchGameState} />;
+    return data?.fetchGameState ? (
+        <GameContainer game={data.fetchGameState} />
+    ) : (
+        <div>no data</div>
+    );
 };
 
 export default RoomPage;

@@ -3,9 +3,10 @@ import { GameService } from "./game.service";
 import { GameResolver } from "./game.resolver";
 import { gameProvider } from "./game.proviers";
 import { GameDataAccessLayer } from "./game.dal";
+import { SubscriptionsModule } from "../subscriptions/subscriptions.module";
 
 @Module({
-    imports: [],
+    imports: [SubscriptionsModule],
     providers: [
         ...gameProvider,
         GameResolver,

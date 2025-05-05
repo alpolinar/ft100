@@ -1,6 +1,7 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import { GameState, InputCreateGame } from "@ods/server-lib";
 import { Effect, Option, pipe } from "effect";
+import { SubscriptionsService } from "../subscriptions/subscriptions.service";
 import { GameDataAccessLayer, GameFilterOptions } from "./game.dal";
 
 @Injectable()
@@ -9,7 +10,9 @@ export class GameService {
 
     constructor(
         @Inject(GameDataAccessLayer)
-        private readonly gameDal: GameDataAccessLayer
+        private readonly gameDal: GameDataAccessLayer,
+        @Inject(SubscriptionsService)
+        private readonly subscription: SubscriptionsService
     ) {}
 
     fetchGameState(
@@ -30,7 +33,12 @@ export class GameService {
                         this.logger.error("No Game State Found!");
                         return Effect.fail(new Error("No Game State Found!"));
                     },
-                    onSome: Effect.succeed,
+                    onSome: (data) => {
+                        this.subscription.listenToGameUpdates(data.id, {
+                            listenToGameUpdates: data,
+                        });
+                        return Effect.succeed(data);
+                    },
                 })
             )
         );

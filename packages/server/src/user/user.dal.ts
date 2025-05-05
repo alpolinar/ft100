@@ -1,14 +1,15 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
-import { FilterOptions } from "../common/utils/type-helpers";
-import { UserAttributes, UserEntity, UserProvider } from "./user.entity";
-import { Effect, flow, Option, pipe } from "effect";
 import { User } from "@ods/server-lib";
+import { Effect, Option, flow, pipe } from "effect";
 import { catchError } from "src/common/utils/helpers";
+import { FilterOptions } from "../common/utils/type-helpers";
+import { UserAttributes } from "./model";
+import { UserEntity, UserProvider } from "./user.entity";
 
 export type UserFilterOptions = FilterOptions<UserAttributes>;
 
 @Injectable()
-export class UserDataAccessLeyer {
+export class UserDataAccessLayer {
     private readonly logger = new Logger("UserDataAccessLeyer");
 
     constructor(
@@ -28,7 +29,7 @@ export class UserDataAccessLeyer {
             Effect.map(
                 flow(
                     Option.fromNullable,
-                    Option.map((e) => e.convertToUser)
+                    Option.map((e) => e.getUserAttributes)
                 )
             )
         );
@@ -47,7 +48,7 @@ export class UserDataAccessLeyer {
             Effect.map(
                 flow(
                     Option.fromNullable,
-                    Option.map((e) => e.convertToUser)
+                    Option.map((e) => e.getUserAttributes)
                 )
             )
         );

@@ -1,4 +1,5 @@
-import { GameModule } from "src/game/game.module";
-import { SubscriptionsModule } from "src/subscriptions/subscriptions.module";
+import { GameModule } from "../../game/game.module";
+import { SubscriptionsModule } from "../../subscriptions/subscriptions.module";
+import { UserModule } from "../../user/user.module";
 
-export const APP_MODULES = [SubscriptionsModule, GameModule];
+export const APP_MODULES = [SubscriptionsModule, UserModule, GameModule];

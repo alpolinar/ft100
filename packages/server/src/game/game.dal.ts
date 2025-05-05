@@ -1,15 +1,14 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
-import { GameState } from "@ods/server-lib";
 import { Effect, Option, flow, pipe } from "effect";
-import { FilterOptions } from "../common/utils/type-helpers";
+import { FilterOptions } from "src/common/utils/type-helpers";
+import { catchError } from "../common/utils/helpers";
 import {
-    GameAttributes,
     GameCreateAttributes,
     GameEntity,
     GameProvider,
     GameUpdateAttributes,
 } from "./game.entity";
-import { catchError } from "../common/utils/helpers";
+import { GameAttributes } from "./model";
 
 export type GameFilterOptions = FilterOptions<GameAttributes>;
 
@@ -25,7 +24,7 @@ export class GameDataAccessLayer {
     findByPk(
         id: string,
         options?: GameFilterOptions
-    ): Effect.Effect<Option.Option<GameState>, Error, never> {
+    ): Effect.Effect<Option.Option<GameAttributes>, Error, never> {
         return pipe(
             Effect.tryPromise({
                 try: () => this.gameRepository.findByPk(id, options),
@@ -38,7 +37,7 @@ export class GameDataAccessLayer {
             Effect.map(
                 flow(
                     Option.fromNullable,
-                    Option.map((e) => e.convertToGameState)
+                    Option.map((e) => e.getGameAttributes)
                 )
             )
         );
@@ -46,7 +45,7 @@ export class GameDataAccessLayer {
 
     findOne(
         options: GameFilterOptions
-    ): Effect.Effect<Option.Option<GameState>, Error, never> {
+    ): Effect.Effect<Option.Option<GameAttributes>, Error, never> {
         return pipe(
             Effect.tryPromise({
                 try: () => this.gameRepository.findOne(options),
@@ -59,7 +58,7 @@ export class GameDataAccessLayer {
             Effect.map(
                 flow(
                     Option.fromNullable,
-                    Option.map((e) => e.convertToGameState)
+                    Option.map((e) => e.getGameAttributes)
                 )
             )
         );
@@ -67,7 +66,7 @@ export class GameDataAccessLayer {
 
     create(
         values: GameCreateAttributes
-    ): Effect.Effect<GameState, Error, never> {
+    ): Effect.Effect<GameAttributes, Error, never> {
         return pipe(
             Effect.tryPromise({
                 try: () => this.gameRepository.create(values),
@@ -77,14 +76,14 @@ export class GameDataAccessLayer {
                     );
                 }),
             }),
-            Effect.map((e) => e.convertToGameState)
+            Effect.map((e) => e.getGameAttributes)
         );
     }
 
     update(
         values: GameUpdateAttributes,
         options?: GameFilterOptions
-    ): Effect.Effect<GameState, Error> {
+    ): Effect.Effect<GameAttributes, Error> {
         return pipe(
             Effect.tryPromise({
                 try: () => this.gameRepository.findByPk(values.id, options),
@@ -119,7 +118,7 @@ export class GameDataAccessLayer {
                                     e.reload({ useMaster: true })
                                 );
 
-                                return e.convertToGameState;
+                                return e.getGameAttributes;
                             }),
                     })
                 )

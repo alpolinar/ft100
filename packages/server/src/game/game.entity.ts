@@ -1,29 +1,20 @@
 import {
+    BelongsTo,
     Column,
     CreatedAt,
     DataType,
     DeletedAt,
+    ForeignKey,
     Model,
     Sequelize,
     Table,
     UpdatedAt,
 } from "sequelize-typescript";
-import { convertToGameState } from "./convert";
+import { UserEntity } from "src/user/user.entity";
+import { getGameAttributes } from "./convert";
+import { GameAttributes } from "./model";
 
 export const GameProvider = "GAME_PROVIDER" as const;
-
-export type GameAttributes = Readonly<{
-    id: string;
-    gameId: string;
-    currentTotal: number;
-    currentPlayerId?: string | null;
-    winnerId?: string | null;
-    fkPlayerOneId?: string | null;
-    fkPlayerTwoId?: string | null;
-    createdAt: Date;
-    updatedAt: Date;
-    deletedAt?: Date | null;
-}>;
 
 export type GameCreateAttributes = Omit<
     GameAttributes,
@@ -73,6 +64,7 @@ export class GameEntity extends Model<GameAttributes, GameCreateAttributes> {
     })
     readonly currentPlayerId?: string;
 
+    @ForeignKey(() => UserEntity)
     @Column({
         type: DataType.UUID,
         field: "winner_id",
@@ -80,6 +72,10 @@ export class GameEntity extends Model<GameAttributes, GameCreateAttributes> {
     })
     readonly winnerId?: string;
 
+    @BelongsTo(() => UserEntity)
+    readonly winner?: UserEntity;
+
+    @ForeignKey(() => UserEntity)
     @Column({
         type: DataType.UUID,
         field: "fk_player_one_id",
@@ -87,12 +83,19 @@ export class GameEntity extends Model<GameAttributes, GameCreateAttributes> {
     })
     readonly fkPlayerOneId?: string;
 
+    @BelongsTo(() => UserEntity)
+    readonly playerOne?: UserEntity;
+
+    @ForeignKey(() => UserEntity)
     @Column({
         type: DataType.UUID,
         field: "fk_player_two_id",
         allowNull: true,
     })
     readonly fkPlayerTwoId?: string;
+
+    @BelongsTo(() => UserEntity)
+    readonly playerTwo?: UserEntity;
 
     @CreatedAt
     @Column({ type: DataType.DATE, field: "created_at", allowNull: false })
@@ -106,7 +109,7 @@ export class GameEntity extends Model<GameAttributes, GameCreateAttributes> {
     @Column({ type: DataType.DATE, field: "deleted_at" })
     readonly deletedAt?: Date;
 
-    get convertToGameState() {
-        return convertToGameState(this);
+    get getGameAttributes() {
+        return getGameAttributes(this);
     }
 }

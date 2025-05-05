@@ -8,22 +8,10 @@ import {
     Table,
     UpdatedAt,
 } from "sequelize-typescript";
-import { convertToUser } from "./convert";
+import { getUserAttributes } from "./convert";
+import { UserAttributes } from "./model";
 
 export const UserProvider = "USER_PROVIDER" as const;
-
-export type UserAttributes = Readonly<{
-    id: string;
-    username: string;
-    email?: string | null;
-    verified: boolean;
-    token?: string | null;
-    img?: string | null;
-    lastLoginAt?: Date | null;
-    createdAt: Date;
-    updatedAt: Date;
-    deletedAt?: Date | null;
-}>;
 
 export type UserCreateAttributes = Omit<
     UserAttributes,
@@ -108,7 +96,7 @@ export class UserEntity extends Model<UserAttributes, UserCreateAttributes> {
     @Column({ type: DataType.DATE, field: "deleted_at" })
     readonly deletedAt?: Date;
 
-    get convertToUser() {
-        return convertToUser(this);
+    get getUserAttributes() {
+        return getUserAttributes(this);
     }
 }

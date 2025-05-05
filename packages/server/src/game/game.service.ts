@@ -2,6 +2,8 @@ import { Inject, Injectable, Logger } from "@nestjs/common";
 import { GameState, InputCreateGame } from "@ods/server-lib";
 import { Effect, Option, pipe } from "effect";
 import { SubscriptionsService } from "../subscriptions/subscriptions.service";
+import { UserEntity } from "../user/user.entity";
+import { convertToGameState } from "./convert";
 import { GameDataAccessLayer, GameFilterOptions } from "./game.dal";
 
 @Injectable()
@@ -26,6 +28,11 @@ export class GameService {
                     ...options?.where,
                     gameId,
                 },
+                include: [
+                    {
+                        model: UserEntity,
+                    },
+                ],
             }),
             Effect.flatMap(
                 Option.match({
@@ -34,10 +41,11 @@ export class GameService {
                         return Effect.fail(new Error("No Game State Found!"));
                     },
                     onSome: (data) => {
+                        const gameState = convertToGameState(data);
                         this.subscription.listenToGameUpdates(data.id, {
-                            listenToGameUpdates: data,
+                            listenToGameUpdates: gameState,
                         });
-                        return Effect.succeed(data);
+                        return Effect.succeed(gameState);
                     },
                 })
             )
@@ -45,13 +53,16 @@ export class GameService {
     }
 
     createGame(input: InputCreateGame): Effect.Effect<GameState, Error, never> {
-        return this.gameDal.create({
-            gameId: input.gameId,
-            currentTotal: input.currentTotal ?? 0,
-            currentPlayerId: input.currentPlayerId,
-            winnerId: input.winnerId,
-            fkPlayerOneId: input.fkPlayerOneId,
-            fkPlayerTwoId: input.fkPlayerTwoId,
-        });
+        return pipe(
+            this.gameDal.create({
+                gameId: input.gameId,
+                currentTotal: input.currentTotal ?? 0,
+                currentPlayerId: input.currentPlayerId,
+                winnerId: input.winnerId,
+                fkPlayerOneId: input.fkPlayerOneId,
+                fkPlayerTwoId: input.fkPlayerTwoId,
+            }),
+            Effect.map(convertToGameState)
+        );
     }
 }

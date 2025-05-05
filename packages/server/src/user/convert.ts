@@ -1,7 +1,8 @@
 import { User } from "@ods/server-lib";
+import { UserAttributes } from "./model";
 import { UserEntity } from "./user.entity";
 
-export const convertToUser = (e: UserEntity): User => {
+export function getUserAttributes(e: UserEntity): UserAttributes {
     return {
         id: e.id,
         username: e.username,
@@ -10,5 +11,20 @@ export const convertToUser = (e: UserEntity): User => {
         email: e.email,
         img: e.img,
         token: e.token,
+        createdAt: e.createdAt,
+        updatedAt: e.updatedAt,
+        deletedAt: e.deletedAt,
     };
-};
+}
+
+export function convertToUser(data: UserAttributes): User {
+    return {
+        id: data.id,
+        username: data.username,
+        verified: data.verified,
+        email: data.email,
+        img: data.img,
+        lastLoginAt: data.lastLoginAt,
+        token: data.token,
+    };
+}

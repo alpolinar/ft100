@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
 import { GameService } from "./game.service";
 import { GameResolver } from "./game.resolver";
-import { gameProvider } from "./game.proviers";
+import { gameProvider } from "./game.providers";
 import { GameDataAccessLayer } from "./game.dal";
 import { SubscriptionsModule } from "../subscriptions/subscriptions.module";
 

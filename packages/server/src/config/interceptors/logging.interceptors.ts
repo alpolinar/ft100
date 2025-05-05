@@ -17,7 +17,7 @@ import { getOpts } from "src/common/utils/request";
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
     private readonly ctxPrefix: string = "LoggingInterceptor";
-    private readonly logger = new Logger("LoggingInterceptor");
+    private readonly logger = new Logger(this.ctxPrefix);
     private readonly excludePaths: ReadonlyArray<string> = [];
 
     constructor(
@@ -62,7 +62,7 @@ export class LoggingInterceptor implements NestInterceptor {
         traceId?: string
     ): void {
         const opts = Effect.runSync(getOpts(context, traceId));
-        this.logger.log(JSON.stringify(opts), "LoggingInterceptor");
+        this.logger.log(JSON.stringify(opts));
     }
 
     /**

@@ -1,10 +1,12 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import { GameState, InputCreateGame } from "@ods/server-lib";
-import { Effect, Option, pipe } from "effect";
+import { Effect, flow, Option, pipe } from "effect";
 import { SubscriptionsService } from "../subscriptions/subscriptions.service";
 import { UserEntity } from "../user/user.entity";
 import { convertToGameState } from "./convert";
-import { GameDataAccessLayer, GameFilterOptions } from "./game.dal";
+import { GameDataAccessLayer, GameOptions } from "./game.dal";
+import { Sequelize } from "sequelize-typescript";
+import { catchError, withTransactionEffect } from "src/common/utils/helpers";
 
 @Injectable()
 export class GameService {
@@ -14,12 +16,13 @@ export class GameService {
         @Inject(GameDataAccessLayer)
         private readonly gameDal: GameDataAccessLayer,
         @Inject(SubscriptionsService)
-        private readonly subscription: SubscriptionsService
+        private readonly subscription: SubscriptionsService,
+        private readonly sequelize: Sequelize
     ) {}
 
     fetchGameState(
         gameId: string,
-        options?: GameFilterOptions
+        options?: GameOptions
     ): Effect.Effect<GameState, Error, never> {
         return pipe(
             this.gameDal.findOne({
@@ -54,15 +57,53 @@ export class GameService {
 
     createGame(input: InputCreateGame): Effect.Effect<GameState, Error, never> {
         return pipe(
-            this.gameDal.create({
-                gameId: input.gameId,
-                currentTotal: input.currentTotal ?? 0,
-                currentPlayerId: input.currentPlayerId,
-                winnerId: input.winnerId,
-                fkPlayerOneId: input.fkPlayerOneId,
-                fkPlayerTwoId: input.fkPlayerTwoId,
-            }),
-            Effect.map(convertToGameState)
+            this.sequelize,
+            withTransactionEffect((transaction) =>
+                pipe(
+                    this.gameDal.create(
+                        {
+                            gameId: input.gameId,
+                            currentTotal: input.currentTotal ?? 0,
+                            currentPlayerId: input.currentPlayerId,
+                            winnerId: input.winnerId,
+                            fkPlayerOneId: input.fkPlayerOneId,
+                            fkPlayerTwoId: input.fkPlayerTwoId,
+                        },
+                        { transaction }
+                    ),
+                    Effect.map(convertToGameState)
+                )
+            )
+        );
+    }
+
+    deleteGame(id: string): Effect.Effect<boolean, Error, never> {
+        return pipe(
+            this.sequelize,
+            withTransactionEffect(
+                (transaction) =>
+                    pipe(
+                        this.gameDal.delete(id, {
+                            transaction,
+                        }),
+                        Effect.flatMap(
+                            Option.match({
+                                onNone: () => {
+                                    this.logger.error(
+                                        `Failed to delete game with ID: ${id}.`
+                                    );
+                                    return Effect.fail(
+                                        new Error("Failed to delete gme.")
+                                    );
+                                },
+                                onSome: () => Effect.succeed(true),
+                            })
+                        )
+                    ),
+                (err) => {
+                    this.logger.error(err.message);
+                }
+            )
         );
     }
 }

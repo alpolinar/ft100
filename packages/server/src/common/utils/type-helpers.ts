@@ -6,7 +6,7 @@ import {
     WhereOptions,
 } from "sequelize";
 
-export type FilterOptions<T> = Partial<{
+export type EntityOptions<T> = Partial<{
     where: WhereOptions<T>;
     order: Order;
     limit: number;

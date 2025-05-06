@@ -2,11 +2,12 @@ import { Inject, Injectable, Logger } from "@nestjs/common";
 import { User } from "@ods/server-lib";
 import { Effect, Option, flow, pipe } from "effect";
 import { catchError } from "src/common/utils/helpers";
-import { FilterOptions } from "../common/utils/type-helpers";
+import { EntityOptions } from "../common/utils/type-helpers";
 import { UserAttributes } from "./model";
 import { UserEntity, UserProvider } from "./user.entity";
+import { GameCreateAttributes } from "src/game/game.entity";
 
-export type UserFilterOptions = FilterOptions<UserAttributes>;
+export type UserOptions = EntityOptions<UserAttributes>;
 
 @Injectable()
 export class UserDataAccessLayer {
@@ -16,7 +17,7 @@ export class UserDataAccessLayer {
         @Inject(UserProvider) private readonly userRepository: typeof UserEntity
     ) {}
 
-    findByPk(id: string, options?: UserFilterOptions) {
+    findByPk(id: string, options?: UserOptions) {
         return pipe(
             Effect.tryPromise({
                 try: () => this.userRepository.findByPk(id, options),
@@ -36,7 +37,7 @@ export class UserDataAccessLayer {
     }
 
     findOne(
-        options: UserFilterOptions
+        options: UserOptions
     ): Effect.Effect<Option.Option<User>, Error, never> {
         return pipe(
             Effect.tryPromise({
@@ -51,6 +52,22 @@ export class UserDataAccessLayer {
                     Option.map((e) => e.getUserAttributes)
                 )
             )
+        );
+    }
+
+    create(
+        values: GameCreateAttributes
+    ): Effect.Effect<UserAttributes, Error, never> {
+        return pipe(
+            Effect.tryPromise({
+                try: () => this.userRepository.create(values),
+                catch: catchError((err) => {
+                    this.logger.error(
+                        `Failed to create game. Error: ${err.message}`
+                    );
+                }),
+            }),
+            Effect.map((e) => e.getUserAttributes)
         );
     }
 }

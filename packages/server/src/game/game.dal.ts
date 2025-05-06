@@ -1,6 +1,6 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import { Effect, Option, flow, pipe } from "effect";
-import { FilterOptions } from "src/common/utils/type-helpers";
+import { EntityOptions } from "../common/utils/type-helpers";
 import { catchError } from "../common/utils/helpers";
 import {
     GameCreateAttributes,
@@ -9,8 +9,9 @@ import {
     GameUpdateAttributes,
 } from "./game.entity";
 import { GameAttributes } from "./model";
+import { Transaction } from "sequelize";
 
-export type GameFilterOptions = FilterOptions<GameAttributes>;
+export type GameOptions = EntityOptions<GameAttributes>;
 
 @Injectable()
 export class GameDataAccessLayer {
@@ -23,7 +24,7 @@ export class GameDataAccessLayer {
 
     findByPk(
         id: string,
-        options?: GameFilterOptions
+        options?: GameOptions
     ): Effect.Effect<Option.Option<GameAttributes>, Error, never> {
         return pipe(
             Effect.tryPromise({
@@ -44,7 +45,7 @@ export class GameDataAccessLayer {
     }
 
     findOne(
-        options: GameFilterOptions
+        options: GameOptions
     ): Effect.Effect<Option.Option<GameAttributes>, Error, never> {
         return pipe(
             Effect.tryPromise({
@@ -65,11 +66,12 @@ export class GameDataAccessLayer {
     }
 
     create(
-        values: GameCreateAttributes
+        values: GameCreateAttributes,
+        options?: Pick<GameOptions, "transaction">
     ): Effect.Effect<GameAttributes, Error, never> {
         return pipe(
             Effect.tryPromise({
-                try: () => this.gameRepository.create(values),
+                try: () => this.gameRepository.create(values, options),
                 catch: catchError((err) => {
                     this.logger.error(
                         `Failed to create game. Error: ${err.message}`
@@ -82,7 +84,7 @@ export class GameDataAccessLayer {
 
     update(
         values: GameUpdateAttributes,
-        options?: GameFilterOptions
+        options?: GameOptions
     ): Effect.Effect<GameAttributes, Error> {
         return pipe(
             Effect.tryPromise({
@@ -123,6 +125,35 @@ export class GameDataAccessLayer {
                     })
                 )
             )
+        );
+    }
+
+    delete(
+        id: string,
+        options?: GameOptions
+    ): Effect.Effect<Option.Option<number>, Error, never> {
+        return pipe(
+            Effect.tryPromise({
+                try: () =>
+                    this.gameRepository.destroy({
+                        ...options,
+                        where: {
+                            ...options?.where,
+                            id,
+                        },
+                    }),
+                catch: catchError((err) => {
+                    this.logger.error(
+                        `Failed to delete game. Error: ${err.message}`
+                    );
+                }),
+            }),
+            Effect.map((deletedRows) => {
+                if (deletedRows === 0) {
+                    return Option.none();
+                }
+                return Option.some(deletedRows);
+            })
         );
     }
 }

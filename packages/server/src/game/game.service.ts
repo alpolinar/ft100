@@ -31,11 +31,7 @@ export class GameService {
                     ...options?.where,
                     gameId,
                 },
-                include: [
-                    {
-                        model: UserEntity,
-                    },
-                ],
+                include: [{ model: UserEntity }],
             }),
             Effect.flatMap(
                 Option.match({
@@ -59,26 +55,27 @@ export class GameService {
     createGame(input: InputCreateGame): Effect.Effect<GameState, Error, never> {
         return pipe(
             this.sequelize,
-            withTransactionEffect((transaction) =>
-                pipe(
-                    this.gameDal.create(
-                        {
-                            gameId: input.gameId,
-                            currentTotal: 0,
-                        },
-                        { transaction }
+            withTransactionEffect({
+                effectFn: (transaction) =>
+                    pipe(
+                        this.gameDal.create(
+                            {
+                                gameId: input.gameId,
+                                currentTotal: 0,
+                            },
+                            { transaction }
+                        ),
+                        Effect.map(convertToGameState)
                     ),
-                    Effect.map(convertToGameState)
-                )
-            )
+            })
         );
     }
 
     deleteGame(id: string): Effect.Effect<boolean, Error, never> {
         return pipe(
             this.sequelize,
-            withTransactionEffect(
-                (transaction) =>
+            withTransactionEffect({
+                effectFn: (transaction) =>
                     pipe(
                         this.gameDal.delete(id, {
                             transaction,
@@ -96,10 +93,10 @@ export class GameService {
                             })
                         )
                     ),
-                (err) => {
+                onError: (err) => {
                     this.logger.error(err.message);
-                }
-            )
+                },
+            })
         );
     }
 }

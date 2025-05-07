@@ -8,6 +8,25 @@ type User {
     lastLoginAt: Date
 }
 
+type Token {
+    userId: String!
+    code: Int!
+    expiryDate: Date!
+}
+
+input InputCreateUser {
+    username: String!
+    email: String
+    img: String
+}
+
+input InputUpdateUser {
+    id: String! # remove id when current user decorator is available
+    username: String
+    email: String
+    img: String
+}
+
 fragment User on User {
     id
     username

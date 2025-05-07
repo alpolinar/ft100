@@ -1,7 +1,7 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import { Effect, Option, flow, pipe } from "effect";
-import { EntityOptions } from "../common/utils/type-helpers";
 import { catchError } from "../common/utils/helpers";
+import { EntityOptions } from "../common/utils/type-helpers";
 import {
     GameCreateAttributes,
     GameEntity,
@@ -9,7 +9,6 @@ import {
     GameUpdateAttributes,
 } from "./game.entity";
 import { GameAttributes } from "./model";
-import { Transaction } from "sequelize";
 
 export type GameOptions = EntityOptions<GameAttributes>;
 
@@ -31,7 +30,7 @@ export class GameDataAccessLayer {
                 try: () => this.gameRepository.findByPk(id, options),
                 catch: catchError((err) => {
                     this.logger.error(
-                        `No Game State Found with ID: ${id}. Error: ${err.message}`
+                        `No Game State Found with ID: ${id}. ${err.message}`
                     );
                 }),
             }),
@@ -51,9 +50,7 @@ export class GameDataAccessLayer {
             Effect.tryPromise({
                 try: () => this.gameRepository.findOne(options),
                 catch: catchError((err) => {
-                    this.logger.error(
-                        `No Game State Found. Error: ${err.message}`
-                    );
+                    this.logger.error(`No Game State Found. ${err.message}`);
                 }),
             }),
             Effect.map(
@@ -73,9 +70,7 @@ export class GameDataAccessLayer {
             Effect.tryPromise({
                 try: () => this.gameRepository.create(values, options),
                 catch: catchError((err) => {
-                    this.logger.error(
-                        `Failed to create game. Error: ${err.message}`
-                    );
+                    this.logger.error(`Failed to create game. ${err.message}`);
                 }),
             }),
             Effect.map((e) => e.getGameAttributes)
@@ -90,9 +85,7 @@ export class GameDataAccessLayer {
             Effect.tryPromise({
                 try: () => this.gameRepository.findByPk(values.id, options),
                 catch: catchError((err) => {
-                    this.logger.error(
-                        `No Game State Found. Error: ${err.message}`
-                    );
+                    this.logger.error(`No Game State Found. ${err.message}`);
                 }),
             }),
             Effect.flatMap(

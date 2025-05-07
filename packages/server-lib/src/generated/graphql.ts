@@ -51,20 +51,21 @@ export type Scalars = {
 export type GameState = {
     readonly currentPlayerId?: Maybe<Scalars["String"]["output"]>;
     readonly currentTotal: Scalars["Int"]["output"];
+    readonly fkPlayerOneId?: Maybe<Scalars["String"]["output"]>;
+    readonly fkPlayerTwoId?: Maybe<Scalars["String"]["output"]>;
     readonly gameId: Scalars["String"]["output"];
     readonly id: Scalars["String"]["output"];
-    readonly playerOne?: Maybe<User>;
-    readonly playerTwo?: Maybe<User>;
     readonly winnerId?: Maybe<Scalars["String"]["output"]>;
 };
 
 export type InputCreateGame = {
-    readonly currentPlayerId?: InputMaybe<Scalars["String"]["input"]>;
-    readonly currentTotal?: InputMaybe<Scalars["Int"]["input"]>;
-    readonly fkPlayerOneId?: InputMaybe<Scalars["String"]["input"]>;
-    readonly fkPlayerTwoId?: InputMaybe<Scalars["String"]["input"]>;
     readonly gameId: Scalars["String"]["input"];
-    readonly winnerId?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type InputCreateUser = {
+    readonly email?: InputMaybe<Scalars["String"]["input"]>;
+    readonly img?: InputMaybe<Scalars["String"]["input"]>;
+    readonly username: Scalars["String"]["input"];
 };
 
 export type InputMove = {
@@ -81,6 +82,13 @@ export type InputUpdateGame = {
     readonly winnerId?: InputMaybe<Scalars["String"]["input"]>;
 };
 
+export type InputUpdateUser = {
+    readonly email?: InputMaybe<Scalars["String"]["input"]>;
+    readonly id: Scalars["String"]["input"];
+    readonly img?: InputMaybe<Scalars["String"]["input"]>;
+    readonly username?: InputMaybe<Scalars["String"]["input"]>;
+};
+
 export type Move = {
     readonly gameId: Scalars["String"]["output"];
     readonly id: Scalars["String"]["output"];
@@ -89,7 +97,12 @@ export type Move = {
 };
 
 export type Mutation = {
+    readonly createGame: GameState;
     readonly sendMove: GameState;
+};
+
+export type MutationCreateGameArgs = {
+    input: InputCreateGame;
 };
 
 export type MutationSendMoveArgs = {
@@ -111,6 +124,12 @@ export type Subscription = {
 
 export type SubscriptionListenToGameUpdatesArgs = {
     channelId: Scalars["String"]["input"];
+};
+
+export type Token = {
+    readonly code: Scalars["Int"]["output"];
+    readonly expiryDate: Scalars["Date"]["output"];
+    readonly userId: Scalars["String"]["output"];
 };
 
 export type User = {
@@ -234,14 +253,17 @@ export type ResolversTypes = {
     Date: ResolverTypeWrapper<Scalars["Date"]["output"]>;
     GameState: ResolverTypeWrapper<GameState>;
     InputCreateGame: InputCreateGame;
+    InputCreateUser: InputCreateUser;
     InputMove: InputMove;
     InputUpdateGame: InputUpdateGame;
+    InputUpdateUser: InputUpdateUser;
     Int: ResolverTypeWrapper<Scalars["Int"]["output"]>;
     Move: ResolverTypeWrapper<Move>;
     Mutation: ResolverTypeWrapper<{}>;
     Query: ResolverTypeWrapper<{}>;
     String: ResolverTypeWrapper<Scalars["String"]["output"]>;
     Subscription: ResolverTypeWrapper<{}>;
+    Token: ResolverTypeWrapper<Token>;
     User: ResolverTypeWrapper<User>;
 };
 
@@ -251,14 +273,17 @@ export type ResolversParentTypes = {
     Date: Scalars["Date"]["output"];
     GameState: GameState;
     InputCreateGame: InputCreateGame;
+    InputCreateUser: InputCreateUser;
     InputMove: InputMove;
     InputUpdateGame: InputUpdateGame;
+    InputUpdateUser: InputUpdateUser;
     Int: Scalars["Int"]["output"];
     Move: Move;
     Mutation: {};
     Query: {};
     String: Scalars["String"]["output"];
     Subscription: {};
+    Token: Token;
     User: User;
 };
 
@@ -278,18 +303,18 @@ export type GameStateResolvers<
         ContextType
     >;
     currentTotal?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
+    fkPlayerOneId?: Resolver<
+        Maybe<ResolversTypes["String"]>,
+        ParentType,
+        ContextType
+    >;
+    fkPlayerTwoId?: Resolver<
+        Maybe<ResolversTypes["String"]>,
+        ParentType,
+        ContextType
+    >;
     gameId?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
     id?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
-    playerOne?: Resolver<
-        Maybe<ResolversTypes["User"]>,
-        ParentType,
-        ContextType
-    >;
-    playerTwo?: Resolver<
-        Maybe<ResolversTypes["User"]>,
-        ParentType,
-        ContextType
-    >;
     winnerId?: Resolver<
         Maybe<ResolversTypes["String"]>,
         ParentType,
@@ -315,6 +340,12 @@ export type MutationResolvers<
     ParentType extends
         ResolversParentTypes["Mutation"] = ResolversParentTypes["Mutation"],
 > = {
+    createGame?: Resolver<
+        ResolversTypes["GameState"],
+        ParentType,
+        ContextType,
+        RequireFields<MutationCreateGameArgs, "input">
+    >;
     sendMove?: Resolver<
         ResolversTypes["GameState"],
         ParentType,
@@ -351,6 +382,17 @@ export type SubscriptionResolvers<
     >;
 };
 
+export type TokenResolvers<
+    ContextType = any,
+    ParentType extends
+        ResolversParentTypes["Token"] = ResolversParentTypes["Token"],
+> = {
+    code?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
+    expiryDate?: Resolver<ResolversTypes["Date"], ParentType, ContextType>;
+    userId?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+    __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type UserResolvers<
     ContextType = any,
     ParentType extends
@@ -377,6 +419,7 @@ export type Resolvers<ContextType = any> = {
     Mutation?: MutationResolvers<ContextType>;
     Query?: QueryResolvers<ContextType>;
     Subscription?: SubscriptionResolvers<ContextType>;
+    Token?: TokenResolvers<ContextType>;
     User?: UserResolvers<ContextType>;
 };
 
@@ -390,28 +433,8 @@ export type GameStateFragment = {
     readonly currentTotal: number;
     readonly currentPlayerId?: string | undefined | null;
     readonly winnerId?: string | undefined | null;
-    readonly playerOne?:
-        | {
-              readonly id: string;
-              readonly username: string;
-              readonly email?: string | undefined | null;
-              readonly verified: boolean;
-              readonly img?: string | undefined | null;
-              readonly lastLoginAt?: Date | undefined | null;
-          }
-        | undefined
-        | null;
-    readonly playerTwo?:
-        | {
-              readonly id: string;
-              readonly username: string;
-              readonly email?: string | undefined | null;
-              readonly verified: boolean;
-              readonly img?: string | undefined | null;
-              readonly lastLoginAt?: Date | undefined | null;
-          }
-        | undefined
-        | null;
+    readonly fkPlayerOneId?: string | undefined | null;
+    readonly fkPlayerTwoId?: string | undefined | null;
 };
 
 export type FetchGameStateQueryVariables = Exact<{
@@ -425,28 +448,24 @@ export type FetchGameStateQuery = {
         readonly currentTotal: number;
         readonly currentPlayerId?: string | undefined | null;
         readonly winnerId?: string | undefined | null;
-        readonly playerOne?:
-            | {
-                  readonly id: string;
-                  readonly username: string;
-                  readonly email?: string | undefined | null;
-                  readonly verified: boolean;
-                  readonly img?: string | undefined | null;
-                  readonly lastLoginAt?: Date | undefined | null;
-              }
-            | undefined
-            | null;
-        readonly playerTwo?:
-            | {
-                  readonly id: string;
-                  readonly username: string;
-                  readonly email?: string | undefined | null;
-                  readonly verified: boolean;
-                  readonly img?: string | undefined | null;
-                  readonly lastLoginAt?: Date | undefined | null;
-              }
-            | undefined
-            | null;
+        readonly fkPlayerOneId?: string | undefined | null;
+        readonly fkPlayerTwoId?: string | undefined | null;
+    };
+};
+
+export type CreateGameMutationVariables = Exact<{
+    input: InputCreateGame;
+}>;
+
+export type CreateGameMutation = {
+    readonly createGame: {
+        readonly id: string;
+        readonly gameId: string;
+        readonly currentTotal: number;
+        readonly currentPlayerId?: string | undefined | null;
+        readonly winnerId?: string | undefined | null;
+        readonly fkPlayerOneId?: string | undefined | null;
+        readonly fkPlayerTwoId?: string | undefined | null;
     };
 };
 
@@ -461,28 +480,8 @@ export type SendMoveMutation = {
         readonly currentTotal: number;
         readonly currentPlayerId?: string | undefined | null;
         readonly winnerId?: string | undefined | null;
-        readonly playerOne?:
-            | {
-                  readonly id: string;
-                  readonly username: string;
-                  readonly email?: string | undefined | null;
-                  readonly verified: boolean;
-                  readonly img?: string | undefined | null;
-                  readonly lastLoginAt?: Date | undefined | null;
-              }
-            | undefined
-            | null;
-        readonly playerTwo?:
-            | {
-                  readonly id: string;
-                  readonly username: string;
-                  readonly email?: string | undefined | null;
-                  readonly verified: boolean;
-                  readonly img?: string | undefined | null;
-                  readonly lastLoginAt?: Date | undefined | null;
-              }
-            | undefined
-            | null;
+        readonly fkPlayerOneId?: string | undefined | null;
+        readonly fkPlayerTwoId?: string | undefined | null;
     };
 };
 
@@ -497,28 +496,8 @@ export type ListenToGameUpdatesSubscription = {
         readonly currentTotal: number;
         readonly currentPlayerId?: string | undefined | null;
         readonly winnerId?: string | undefined | null;
-        readonly playerOne?:
-            | {
-                  readonly id: string;
-                  readonly username: string;
-                  readonly email?: string | undefined | null;
-                  readonly verified: boolean;
-                  readonly img?: string | undefined | null;
-                  readonly lastLoginAt?: Date | undefined | null;
-              }
-            | undefined
-            | null;
-        readonly playerTwo?:
-            | {
-                  readonly id: string;
-                  readonly username: string;
-                  readonly email?: string | undefined | null;
-                  readonly verified: boolean;
-                  readonly img?: string | undefined | null;
-                  readonly lastLoginAt?: Date | undefined | null;
-              }
-            | undefined
-            | null;
+        readonly fkPlayerOneId?: string | undefined | null;
+        readonly fkPlayerTwoId?: string | undefined | null;
     };
 };
 
@@ -531,6 +510,17 @@ export type UserFragment = {
     readonly lastLoginAt?: Date | undefined | null;
 };
 
+export const GameStateFragmentDoc = gql`
+    fragment GameState on GameState {
+  id
+  gameId
+  currentTotal
+  currentPlayerId
+  winnerId
+  fkPlayerOneId
+  fkPlayerTwoId
+}
+    `;
 export const UserFragmentDoc = gql`
     fragment User on User {
   id
@@ -541,21 +531,6 @@ export const UserFragmentDoc = gql`
   lastLoginAt
 }
     `;
-export const GameStateFragmentDoc = gql`
-    fragment GameState on GameState {
-  id
-  gameId
-  currentTotal
-  currentPlayerId
-  winnerId
-  playerOne {
-    ...User
-  }
-  playerTwo {
-    ...User
-  }
-}
-    ${UserFragmentDoc}`;
 export const HealthcheckDocument = gql`
     query healthcheck {
   healthcheck
@@ -710,6 +685,56 @@ export type FetchGameStateSuspenseQueryHookResult = ReturnType<
 export type FetchGameStateQueryResult = Apollo.QueryResult<
     FetchGameStateQuery,
     FetchGameStateQueryVariables
+>;
+export const CreateGameDocument = gql`
+    mutation createGame($input: InputCreateGame!) {
+  createGame(input: $input) {
+    ...GameState
+  }
+}
+    ${GameStateFragmentDoc}`;
+export type CreateGameMutationFn = Apollo.MutationFunction<
+    CreateGameMutation,
+    CreateGameMutationVariables
+>;
+
+/**
+ * __useCreateGameMutation__
+ *
+ * To run a mutation, you first call `useCreateGameMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateGameMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createGameMutation, { data, loading, error }] = useCreateGameMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateGameMutation(
+    baseOptions?: Apollo.MutationHookOptions<
+        CreateGameMutation,
+        CreateGameMutationVariables
+    >
+) {
+    const options = { ...defaultOptions, ...baseOptions };
+    return Apollo.useMutation<CreateGameMutation, CreateGameMutationVariables>(
+        CreateGameDocument,
+        options
+    );
+}
+export type CreateGameMutationHookResult = ReturnType<
+    typeof useCreateGameMutation
+>;
+export type CreateGameMutationResult =
+    Apollo.MutationResult<CreateGameMutation>;
+export type CreateGameMutationOptions = Apollo.BaseMutationOptions<
+    CreateGameMutation,
+    CreateGameMutationVariables
 >;
 export const SendMoveDocument = gql`
     mutation sendMove($input: InputMove!) {

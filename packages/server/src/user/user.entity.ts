@@ -18,7 +18,7 @@ export type UserCreateAttributes = Omit<
     "id" | "createdAt" | "updatedAt" | "deletedAt"
 >;
 
-export type GameUpdateAttributes = Omit<
+export type UserUpdateAttributes = Omit<
     UserAttributes,
     "createdAt" | "updatedAt" | "deletedAt"
 >;

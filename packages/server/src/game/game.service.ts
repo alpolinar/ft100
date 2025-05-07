@@ -1,12 +1,12 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import { GameState, InputCreateGame } from "@ods/server-lib";
-import { Effect, flow, Option, pipe } from "effect";
+import { Effect, Option, pipe } from "effect";
+import { Sequelize } from "sequelize-typescript";
+import { withTransactionEffect } from "src/common/utils/helpers";
 import { SubscriptionsService } from "../subscriptions/subscriptions.service";
 import { UserEntity } from "../user/user.entity";
 import { convertToGameState } from "./convert";
 import { GameDataAccessLayer, GameOptions } from "./game.dal";
-import { Sequelize } from "sequelize-typescript";
-import { catchError, withTransactionEffect } from "src/common/utils/helpers";
 
 @Injectable()
 export class GameService {
@@ -40,8 +40,9 @@ export class GameService {
             Effect.flatMap(
                 Option.match({
                     onNone: () => {
-                        this.logger.error("No Game State Found!");
-                        return Effect.fail(new Error("No Game State Found!"));
+                        const err = new Error("No Game State Found!");
+                        this.logger.error(err.message);
+                        return Effect.fail(err);
                     },
                     onSome: (data) => {
                         const gameState = convertToGameState(data);
@@ -63,11 +64,7 @@ export class GameService {
                     this.gameDal.create(
                         {
                             gameId: input.gameId,
-                            currentTotal: input.currentTotal ?? 0,
-                            currentPlayerId: input.currentPlayerId,
-                            winnerId: input.winnerId,
-                            fkPlayerOneId: input.fkPlayerOneId,
-                            fkPlayerTwoId: input.fkPlayerTwoId,
+                            currentTotal: 0,
                         },
                         { transaction }
                     ),
@@ -89,12 +86,11 @@ export class GameService {
                         Effect.flatMap(
                             Option.match({
                                 onNone: () => {
-                                    this.logger.error(
+                                    const err = new Error(
                                         `Failed to delete game with ID: ${id}.`
                                     );
-                                    return Effect.fail(
-                                        new Error("Failed to delete gme.")
-                                    );
+                                    this.logger.error(err.message);
+                                    return Effect.fail(err);
                                 },
                                 onSome: () => Effect.succeed(true),
                             })

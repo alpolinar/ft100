@@ -14,6 +14,8 @@ export const envSchema = z.object({
     DB_PASSWORD: z.string(),
     DB: z.string(),
     npm_package_version: z.string(),
+    HMAC_KEY: z.string(),
+    ENCRYPT_KEY: z.string(),
 });
 
 export const configOptions: ConfigModuleOptions = {

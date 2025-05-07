@@ -1,5 +1,11 @@
 import { z } from "zod";
-import { InputCreateGame, InputMove, InputUpdateGame } from "./graphql";
+import {
+    InputCreateGame,
+    InputCreateUser,
+    InputMove,
+    InputUpdateGame,
+    InputUpdateUser,
+} from "./graphql";
 
 type Properties<T> = Required<{
     [K in keyof T]: z.ZodType<T[K], any, T[K]>;
@@ -18,12 +24,17 @@ export function InputCreateGameSchema(): z.ZodObject<
     Properties<InputCreateGame>
 > {
     return z.object({
-        currentPlayerId: z.string().nullish(),
-        currentTotal: z.number().nullish(),
-        fkPlayerOneId: z.string().nullish(),
-        fkPlayerTwoId: z.string().nullish(),
         gameId: z.string(),
-        winnerId: z.string().nullish(),
+    });
+}
+
+export function InputCreateUserSchema(): z.ZodObject<
+    Properties<InputCreateUser>
+> {
+    return z.object({
+        email: z.string().nullish(),
+        img: z.string().nullish(),
+        username: z.string(),
     });
 }
 
@@ -44,5 +55,16 @@ export function InputUpdateGameSchema(): z.ZodObject<
         fkPlayerOneId: z.string().nullish(),
         fkPlayerTwoId: z.string().nullish(),
         winnerId: z.string().nullish(),
+    });
+}
+
+export function InputUpdateUserSchema(): z.ZodObject<
+    Properties<InputUpdateUser>
+> {
+    return z.object({
+        email: z.string().nullish(),
+        id: z.string(),
+        img: z.string().nullish(),
+        username: z.string().nullish(),
     });
 }

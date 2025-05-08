@@ -31,7 +31,11 @@ export class GameService {
                     ...options?.where,
                     gameId,
                 },
-                include: [{ model: UserEntity }],
+                include: [
+                    { model: UserEntity, as: "winner" },
+                    { model: UserEntity, as: "playerOne" },
+                    { model: UserEntity, as: "playerTwo" },
+                ],
             }),
             Effect.flatMap(
                 Option.match({

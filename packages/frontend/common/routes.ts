@@ -1,4 +1,5 @@
 export enum Route {
     home = "/",
-    game = "/room",
+    game = "/game",
+    join = "/game/join",
 }

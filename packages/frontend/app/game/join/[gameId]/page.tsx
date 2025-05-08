@@ -1,14 +1,15 @@
+import { Params } from "@/common/ssr-params";
 import { query } from "@/graphql-client/ssr-client";
-import { GameContainer } from "@/room/components/GameContainer";
+import { GameContainer } from "@/game/container/GameContainer";
 import {
     FetchGameStateDocument,
     FetchGameStateQuery,
     FetchGameStateQueryVariables,
 } from "@ods/server-lib";
 
-type GamePageProps = Readonly<{ params: Promise<{ gameId: string }> }>;
+type GamePageProps = Params;
 
-const RoomPage = async ({ params }: GamePageProps) => {
+const GamePage = async ({ params }: GamePageProps) => {
     const { gameId } = await params;
 
     const { data } = await query<
@@ -28,4 +29,4 @@ const RoomPage = async ({ params }: GamePageProps) => {
     );
 };
 
-export default RoomPage;
+export default GamePage;

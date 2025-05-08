@@ -1,0 +1,33 @@
+"use client";
+
+import { Route } from "@/common/routes";
+import { Button } from "@/components/ui/button";
+import { GameState } from "@ods/server-lib";
+import Link from "next/link";
+import { GameStateListener } from "../providers/GameStateListener";
+
+export type GameContainerProps = Readonly<{ game: GameState }>;
+
+export const GameContainer = ({ game }: GameContainerProps) => {
+    return (
+        <div className="flex flex-col h-full">
+            <div className="p-4">
+                <Link href={Route.home}>
+                    <Button>Quit</Button>
+                </Link>
+            </div>
+            <hr />
+            <div className="h-full p-4">
+                <GameStateListener gameState={game}>
+                    {({ state, loading }) => {
+                        return loading ? (
+                            <div>loading...</div>
+                        ) : (
+                            <div>id: {state?.id}</div>
+                        );
+                    }}
+                </GameStateListener>
+            </div>
+        </div>
+    );
+};

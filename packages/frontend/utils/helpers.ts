@@ -3,13 +3,10 @@ import { randomBytes } from "node:crypto";
 export function generateGameId(length = 10): string {
     const chars =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    const bytes = randomBytes(length);
-    const charsLength = chars.length;
-    let id = "";
+    const array = new Uint8Array(length);
+    crypto.getRandomValues(array);
 
-    for (let i = 0; i < length; i++) {
-        id += chars[bytes[i] % charsLength];
-    }
-
-    return id.toUpperCase();
+    return Array.from(array, (byte) => chars[byte % chars.length])
+        .join("")
+        .toUpperCase();
 }

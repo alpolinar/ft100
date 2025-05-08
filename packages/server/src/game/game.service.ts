@@ -103,4 +103,53 @@ export class GameService {
             })
         );
     }
+
+    // async connectPlayer(input: InputConnectPlayer): Promise<GameState> {
+    //     const gameState = await Effect.runPromise(
+    //         this.gameDal.findOne({
+    //             where: {
+    //                 gameId: input.gameId,
+    //             },
+    //         })
+    //     );
+    //
+    //     if (Option.isNone(gameState)) {
+    //         throw new NotFoundException("No Game State Found");
+    //     }
+    //
+    //     if (
+    //         gameState.value.fkPlayerOneId === input.playerId ||
+    //         gameState.value.fkPlayerTwoId === input.playerId
+    //     ) {
+    //         return gameState.value;
+    //     }
+    //
+    //     if (!gameState.value.fkPlayerOneId) {
+    //         const newState = await Effect.runPromise(
+    //             this.gameDal.update({
+    //                 id: gameState.value.id,
+    //                 gameId: gameState.value.gameId,
+    //                 currentTotal: gameState.value.currentTotal,
+    //                 fkPlayerOneId: input.playerId,
+    //                 fkPlayerTwoId: gameState.value.fkPlayerTwoId,
+    //             })
+    //         );
+    //         return convertToGameState(newState);
+    //     }
+    //
+    //     if (!gameState.value.fkPlayerTwoId) {
+    //         const newState = await Effect.runPromise(
+    //             this.gameDal.update({
+    //                 id: gameState.value.id,
+    //                 gameId: gameState.value.gameId,
+    //                 currentTotal: gameState.value.currentTotal,
+    //                 fkPlayerOneId: gameState.value.fkPlayerOneId,
+    //                 fkPlayerTwoId: input.playerId,
+    //             })
+    //         );
+    //         return convertToGameState(newState);
+    //     }
+    //
+    //     throw new BadRequestException("Game Full!");
+    // }
 }

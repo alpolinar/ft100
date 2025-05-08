@@ -19,8 +19,10 @@ export const GameContainer = ({ game }: GameContainerProps) => {
             <hr />
             <div className="h-full p-4">
                 <GameStateListener gameState={game}>
-                    {({ state }) => {
-                        return !state ? (
+                    {({ state, error }) => {
+                        return error ? (
+                            <div>something went wrong</div>
+                        ) : !state ? (
                             <div>loading...</div>
                         ) : (
                             <div>id: {state.id}</div>

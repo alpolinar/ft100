@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { generateGameId } from "@/utils/helpers";
 import { useCreateGameMutation } from "@ods/server-lib";
 import Link from "next/link";
-import { join } from "node:path";
 import { useState } from "react";
 import { useGameStore } from "../store/store";
 
@@ -39,7 +38,7 @@ const GameDashboardContainer = () => {
             <Button onClick={handleCreateGame} disabled={gameId !== ""}>
                 create game
             </Button>
-            <Link href={join(Route.game, gameId)}>
+            <Link href={`${Route.game}/${gameId}`}>
                 <Button disabled={!gameId}>Join</Button>
             </Link>
         </div>

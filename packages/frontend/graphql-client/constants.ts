@@ -1,6 +1,7 @@
 import { env } from "@/env";
-import { DefaultOptions, HttpLink } from "@apollo/client";
+import { DefaultOptions, HttpLink, split } from "@apollo/client";
 import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
+import { getMainDefinition } from "@apollo/client/utilities";
 import { createClient } from "graphql-ws";
 
 const getWsServerEndpoint = () => {
@@ -43,6 +44,20 @@ const getServerEndpoint = (): string => {
 export const httpLink = new HttpLink({
     uri: `${getServerEndpoint()}/api`,
 });
+
+export const clientLinks = wsLink
+    ? split(
+          ({ query }) => {
+              const definition = getMainDefinition(query);
+              return (
+                  definition.kind === "OperationDefinition" &&
+                  definition.operation === "subscription"
+              );
+          },
+          wsLink,
+          httpLink
+      )
+    : httpLink;
 
 export const defaultOptions: DefaultOptions = {
     watchQuery: {

@@ -1,10 +1,11 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import { UserDataAccessLayer, UserOptions } from "./user.dal";
-import { Effect, Exit, Option, pipe } from "effect";
-import { Token, User } from "@ods/server-lib";
+import { Effect, Option, pipe } from "effect";
+import { InputCreateUser, Token, User } from "@ods/server-lib";
 import { AppConfigService } from "../app-config/app.config.service";
 import { CryptoService } from "../common/utils/crypto";
 import { randomInt } from "node:crypto";
+import { convertToUser } from "./convert";
 
 @Injectable()
 export class UserService {
@@ -31,7 +32,7 @@ export class UserService {
                         this.logger.error(err.message);
                         return Effect.fail(err);
                     },
-                    onSome: Effect.succeed,
+                    onSome: (data) => Effect.succeed(data),
                 })
             )
         );
@@ -53,27 +54,45 @@ export class UserService {
                         this.logger.error(err.message);
                         return Effect.fail(err);
                     },
-                    onSome: Effect.succeed,
+                    onSome: (data) => Effect.succeed(data),
                 })
             )
         );
     }
 
-    generateUserToken(userId: string): Effect.Effect<string, Error, never> {
+    createUser(input: InputCreateUser): Effect.Effect<User, Error, never> {
+        return pipe(
+            this.userDal.create({
+                username: input.username,
+                verified: false,
+                email: input.email,
+                img: input.img,
+            }),
+            Effect.map((user) => convertToUser(user))
+        );
+    }
+
+    generateToken(
+        userId: string
+    ): Effect.Effect<{ code: number; token: string }, Error, never> {
         const code = randomInt(100_000, 1_000_000);
         const expiryDate = new Date(
             Date.now() + 5 * 60 * 1000 //5 minutes
         );
-        const result = Effect.runSyncExit(
-            this.encryptor.encrypt({
-                userId,
-                code,
-                expiryDate,
-            })
+        return pipe(
+            this.encryptor.encrypt({ userId, code, expiryDate }),
+            Effect.map((token) => ({ code, token }))
         );
-        if (Exit.isFailure(result)) {
-            return Effect.fail(new Error("Failed to generate user token."));
-        }
-        return Effect.succeed(result.value);
+    }
+
+    validateToken(
+        token: string,
+        submittedCode: number
+    ): Effect.Effect<boolean, Error, never> {
+        return pipe(
+            token,
+            this.encryptor.decrypt,
+            Effect.map(({ code }) => code === submittedCode)
+        );
     }
 }

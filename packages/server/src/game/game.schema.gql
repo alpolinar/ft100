@@ -36,6 +36,10 @@ input InputUpdateGame {
     fkPlayerTwoId: String
 }
 
+input InputConnectPlayer {
+    gameId: String!
+}
+
 fragment GameState on GameState {
     id
     gameId
@@ -56,6 +60,7 @@ fragment GameState on GameState {
 
 type Query {
     fetchGameState(id: String!): GameState!
+    fetchAllUserGames: [GameState!]!
 }
 
 query fetchGameState($id: String!) {
@@ -64,9 +69,16 @@ query fetchGameState($id: String!) {
     }
 }
 
+query fetchAllUserGames {
+    fetchAllUserGames {
+        ...GameState
+    }
+}
+
 type Mutation {
     createGame(input: InputCreateGame!): GameState!
     sendMove(input: InputMove!): GameState!
+    connectPlayer(input: InputConnectPlayer): GameState!
 }
 
 mutation createGame($input: InputCreateGame!) {
@@ -77,6 +89,12 @@ mutation createGame($input: InputCreateGame!) {
 
 mutation sendMove($input: InputMove!) {
     sendMove(input: $input) {
+        ...GameState
+    }
+}
+
+mutation connectPlayer($input: InputConnectPlayer!) {
+    connectPlayer(input: $input) {
         ...GameState
     }
 }

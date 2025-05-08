@@ -1,5 +1,6 @@
 import { z } from "zod";
 import {
+    InputConnectPlayer,
     InputCreateGame,
     InputCreateUser,
     InputMove,
@@ -19,6 +20,14 @@ export const isDefinedNonNullAny = (v: any): v is definedNonNullAny =>
 export const definedNonNullAnySchema = z
     .any()
     .refine((v) => isDefinedNonNullAny(v));
+
+export function InputConnectPlayerSchema(): z.ZodObject<
+    Properties<InputConnectPlayer>
+> {
+    return z.object({
+        gameId: z.string(),
+    });
+}
 
 export function InputCreateGameSchema(): z.ZodObject<
     Properties<InputCreateGame>

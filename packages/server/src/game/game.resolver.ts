@@ -1,5 +1,9 @@
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
-import { GameState, InputCreateGame } from "@ods/server-lib";
+import {
+    GameState,
+    InputConnectPlayer,
+    InputCreateGame,
+} from "@ods/server-lib";
 import { Effect } from "effect";
 import { GameService } from "./game.service";
 
@@ -18,4 +22,7 @@ export class GameResolver {
     ): Promise<GameState> {
         return await Effect.runPromise(this.gameService.createGame(input));
     }
+
+    @Mutation("connectPlayer")
+    async connectPlayer(@Args("gameId") gameId: string) {}
 }

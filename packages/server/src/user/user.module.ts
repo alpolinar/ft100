@@ -5,6 +5,7 @@ import { userProvider } from "./user.provider";
 import { UserResolver } from "./user.resolver";
 import { UserDataAccessLayer } from "./user.dal";
 import { AppConfigService } from "../app-config/app.config.service";
+import { AuthService } from "./auth.service";
 
 @Module({
     imports: [SubscriptionsModule],
@@ -14,6 +15,7 @@ import { AppConfigService } from "../app-config/app.config.service";
         UserService,
         UserDataAccessLayer,
         AppConfigService,
+        AuthService,
     ],
     exports: [UserService],
 })

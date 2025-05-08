@@ -58,6 +58,10 @@ export type GameState = {
     readonly winnerId?: Maybe<Scalars["String"]["output"]>;
 };
 
+export type InputConnectPlayer = {
+    readonly gameId: Scalars["String"]["input"];
+};
+
 export type InputCreateGame = {
     readonly gameId: Scalars["String"]["input"];
 };
@@ -97,8 +101,14 @@ export type Move = {
 };
 
 export type Mutation = {
+    readonly connectPlayer: GameState;
     readonly createGame: GameState;
     readonly sendMove: GameState;
+    readonly signIn: User;
+};
+
+export type MutationConnectPlayerArgs = {
+    input?: InputMaybe<InputConnectPlayer>;
 };
 
 export type MutationCreateGameArgs = {
@@ -109,7 +119,12 @@ export type MutationSendMoveArgs = {
     input: InputMove;
 };
 
+export type MutationSignInArgs = {
+    email: Scalars["String"]["input"];
+};
+
 export type Query = {
+    readonly fetchAllUserGames: ReadonlyArray<GameState>;
     readonly fetchGameState: GameState;
     readonly healthcheck: Scalars["String"]["output"];
 };
@@ -137,7 +152,6 @@ export type User = {
     readonly id: Scalars["String"]["output"];
     readonly img?: Maybe<Scalars["String"]["output"]>;
     readonly lastLoginAt?: Maybe<Scalars["Date"]["output"]>;
-    readonly token?: Maybe<Scalars["String"]["output"]>;
     readonly username: Scalars["String"]["output"];
     readonly verified: Scalars["Boolean"]["output"];
 };
@@ -252,6 +266,7 @@ export type ResolversTypes = {
     Boolean: ResolverTypeWrapper<Scalars["Boolean"]["output"]>;
     Date: ResolverTypeWrapper<Scalars["Date"]["output"]>;
     GameState: ResolverTypeWrapper<GameState>;
+    InputConnectPlayer: InputConnectPlayer;
     InputCreateGame: InputCreateGame;
     InputCreateUser: InputCreateUser;
     InputMove: InputMove;
@@ -272,6 +287,7 @@ export type ResolversParentTypes = {
     Boolean: Scalars["Boolean"]["output"];
     Date: Scalars["Date"]["output"];
     GameState: GameState;
+    InputConnectPlayer: InputConnectPlayer;
     InputCreateGame: InputCreateGame;
     InputCreateUser: InputCreateUser;
     InputMove: InputMove;
@@ -340,6 +356,12 @@ export type MutationResolvers<
     ParentType extends
         ResolversParentTypes["Mutation"] = ResolversParentTypes["Mutation"],
 > = {
+    connectPlayer?: Resolver<
+        ResolversTypes["GameState"],
+        ParentType,
+        ContextType,
+        Partial<MutationConnectPlayerArgs>
+    >;
     createGame?: Resolver<
         ResolversTypes["GameState"],
         ParentType,
@@ -352,6 +374,12 @@ export type MutationResolvers<
         ContextType,
         RequireFields<MutationSendMoveArgs, "input">
     >;
+    signIn?: Resolver<
+        ResolversTypes["User"],
+        ParentType,
+        ContextType,
+        RequireFields<MutationSignInArgs, "email">
+    >;
 };
 
 export type QueryResolvers<
@@ -359,6 +387,11 @@ export type QueryResolvers<
     ParentType extends
         ResolversParentTypes["Query"] = ResolversParentTypes["Query"],
 > = {
+    fetchAllUserGames?: Resolver<
+        ReadonlyArray<ResolversTypes["GameState"]>,
+        ParentType,
+        ContextType
+    >;
     fetchGameState?: Resolver<
         ResolversTypes["GameState"],
         ParentType,
@@ -406,7 +439,6 @@ export type UserResolvers<
         ParentType,
         ContextType
     >;
-    token?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
     username?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
     verified?: Resolver<ResolversTypes["Boolean"], ParentType, ContextType>;
     __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -453,6 +485,20 @@ export type FetchGameStateQuery = {
     };
 };
 
+export type FetchAllUserGamesQueryVariables = Exact<{ [key: string]: never }>;
+
+export type FetchAllUserGamesQuery = {
+    readonly fetchAllUserGames: ReadonlyArray<{
+        readonly id: string;
+        readonly gameId: string;
+        readonly currentTotal: number;
+        readonly currentPlayerId?: string | undefined | null;
+        readonly winnerId?: string | undefined | null;
+        readonly fkPlayerOneId?: string | undefined | null;
+        readonly fkPlayerTwoId?: string | undefined | null;
+    }>;
+};
+
 export type CreateGameMutationVariables = Exact<{
     input: InputCreateGame;
 }>;
@@ -475,6 +521,22 @@ export type SendMoveMutationVariables = Exact<{
 
 export type SendMoveMutation = {
     readonly sendMove: {
+        readonly id: string;
+        readonly gameId: string;
+        readonly currentTotal: number;
+        readonly currentPlayerId?: string | undefined | null;
+        readonly winnerId?: string | undefined | null;
+        readonly fkPlayerOneId?: string | undefined | null;
+        readonly fkPlayerTwoId?: string | undefined | null;
+    };
+};
+
+export type ConnectPlayerMutationVariables = Exact<{
+    input: InputConnectPlayer;
+}>;
+
+export type ConnectPlayerMutation = {
+    readonly connectPlayer: {
         readonly id: string;
         readonly gameId: string;
         readonly currentTotal: number;
@@ -686,6 +748,83 @@ export type FetchGameStateQueryResult = Apollo.QueryResult<
     FetchGameStateQuery,
     FetchGameStateQueryVariables
 >;
+export const FetchAllUserGamesDocument = gql`
+    query fetchAllUserGames {
+  fetchAllUserGames {
+    ...GameState
+  }
+}
+    ${GameStateFragmentDoc}`;
+
+/**
+ * __useFetchAllUserGamesQuery__
+ *
+ * To run a query within a React component, call `useFetchAllUserGamesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useFetchAllUserGamesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useFetchAllUserGamesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useFetchAllUserGamesQuery(
+    baseOptions?: Apollo.QueryHookOptions<
+        FetchAllUserGamesQuery,
+        FetchAllUserGamesQueryVariables
+    >
+) {
+    const options = { ...defaultOptions, ...baseOptions };
+    return Apollo.useQuery<
+        FetchAllUserGamesQuery,
+        FetchAllUserGamesQueryVariables
+    >(FetchAllUserGamesDocument, options);
+}
+export function useFetchAllUserGamesLazyQuery(
+    baseOptions?: Apollo.LazyQueryHookOptions<
+        FetchAllUserGamesQuery,
+        FetchAllUserGamesQueryVariables
+    >
+) {
+    const options = { ...defaultOptions, ...baseOptions };
+    return Apollo.useLazyQuery<
+        FetchAllUserGamesQuery,
+        FetchAllUserGamesQueryVariables
+    >(FetchAllUserGamesDocument, options);
+}
+export function useFetchAllUserGamesSuspenseQuery(
+    baseOptions?:
+        | Apollo.SkipToken
+        | Apollo.SuspenseQueryHookOptions<
+              FetchAllUserGamesQuery,
+              FetchAllUserGamesQueryVariables
+          >
+) {
+    const options =
+        baseOptions === Apollo.skipToken
+            ? baseOptions
+            : { ...defaultOptions, ...baseOptions };
+    return Apollo.useSuspenseQuery<
+        FetchAllUserGamesQuery,
+        FetchAllUserGamesQueryVariables
+    >(FetchAllUserGamesDocument, options);
+}
+export type FetchAllUserGamesQueryHookResult = ReturnType<
+    typeof useFetchAllUserGamesQuery
+>;
+export type FetchAllUserGamesLazyQueryHookResult = ReturnType<
+    typeof useFetchAllUserGamesLazyQuery
+>;
+export type FetchAllUserGamesSuspenseQueryHookResult = ReturnType<
+    typeof useFetchAllUserGamesSuspenseQuery
+>;
+export type FetchAllUserGamesQueryResult = Apollo.QueryResult<
+    FetchAllUserGamesQuery,
+    FetchAllUserGamesQueryVariables
+>;
 export const CreateGameDocument = gql`
     mutation createGame($input: InputCreateGame!) {
   createGame(input: $input) {
@@ -782,6 +921,56 @@ export type SendMoveMutationResult = Apollo.MutationResult<SendMoveMutation>;
 export type SendMoveMutationOptions = Apollo.BaseMutationOptions<
     SendMoveMutation,
     SendMoveMutationVariables
+>;
+export const ConnectPlayerDocument = gql`
+    mutation connectPlayer($input: InputConnectPlayer!) {
+  connectPlayer(input: $input) {
+    ...GameState
+  }
+}
+    ${GameStateFragmentDoc}`;
+export type ConnectPlayerMutationFn = Apollo.MutationFunction<
+    ConnectPlayerMutation,
+    ConnectPlayerMutationVariables
+>;
+
+/**
+ * __useConnectPlayerMutation__
+ *
+ * To run a mutation, you first call `useConnectPlayerMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useConnectPlayerMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [connectPlayerMutation, { data, loading, error }] = useConnectPlayerMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useConnectPlayerMutation(
+    baseOptions?: Apollo.MutationHookOptions<
+        ConnectPlayerMutation,
+        ConnectPlayerMutationVariables
+    >
+) {
+    const options = { ...defaultOptions, ...baseOptions };
+    return Apollo.useMutation<
+        ConnectPlayerMutation,
+        ConnectPlayerMutationVariables
+    >(ConnectPlayerDocument, options);
+}
+export type ConnectPlayerMutationHookResult = ReturnType<
+    typeof useConnectPlayerMutation
+>;
+export type ConnectPlayerMutationResult =
+    Apollo.MutationResult<ConnectPlayerMutation>;
+export type ConnectPlayerMutationOptions = Apollo.BaseMutationOptions<
+    ConnectPlayerMutation,
+    ConnectPlayerMutationVariables
 >;
 export const ListenToGameUpdatesDocument = gql`
     subscription listenToGameUpdates($channelId: String!) {

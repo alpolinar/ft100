@@ -7,7 +7,7 @@ import {
     FetchGameStateQueryVariables,
 } from "@ods/server-lib";
 
-type GamePageProps = Params;
+type GamePageProps = Params<{ gameId: string }>;
 
 const GamePage = async ({ params }: GamePageProps) => {
     const { gameId } = await params;

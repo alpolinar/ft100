@@ -1,10 +1,10 @@
 "use client";
 
-import { Route } from "@/common/routes";
-import { Button } from "@/components/ui/button";
 import { GameState } from "@ods/server-lib";
-import Link from "next/link";
 import { GameStateListener } from "../providers/GameStateListener";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Route } from "@/common/routes";
 
 export type GameContainerProps = Readonly<{ game: GameState }>;
 
@@ -19,11 +19,11 @@ export const GameContainer = ({ game }: GameContainerProps) => {
             <hr />
             <div className="h-full p-4">
                 <GameStateListener gameState={game}>
-                    {({ state, loading }) => {
-                        return loading ? (
+                    {({ state }) => {
+                        return !state ? (
                             <div>loading...</div>
                         ) : (
-                            <div>id: {state?.id}</div>
+                            <div>id: {state.id}</div>
                         );
                     }}
                 </GameStateListener>

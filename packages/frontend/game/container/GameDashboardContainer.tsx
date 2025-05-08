@@ -16,15 +16,14 @@ const GameDashboardContainer = () => {
     const [createGameMutation] = useCreateGameMutation();
 
     const handleCreateGame = () => {
-        const gameId = generateGameId();
         createGameMutation({
             variables: {
                 input: {
-                    gameId,
+                    gameId: generateGameId(),
                 },
             },
             onCompleted: ({ createGame }) => {
-                setGameId(gameId);
+                setGameId(createGame.gameId);
                 setGame(createGame);
             },
             onError: (err) => {
@@ -36,11 +35,11 @@ const GameDashboardContainer = () => {
 
     return (
         <div>
-            <p>build a UI for creating a game and a join button</p>
+            <p>build a UI for creating a game and joining a game</p>
             <Button onClick={handleCreateGame} disabled={gameId !== ""}>
                 create game
             </Button>
-            <Link href={join(Route.join, gameId)}>
+            <Link href={join(Route.game, gameId)}>
                 <Button disabled={!gameId}>Join</Button>
             </Link>
         </div>

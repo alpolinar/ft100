@@ -13,7 +13,6 @@ export const GameStateListener = ({
     children: React.FC<
         Readonly<{
             state: GameState | null;
-            loading: boolean;
             error?: ApolloError;
         }>
     >;
@@ -25,17 +24,17 @@ export const GameStateListener = ({
         variables: {
             channelId: gameState.id,
         },
+        shouldResubscribe: true,
     });
 
     useEffect(() => {
         if (!game) {
-            setGame(data?.listenToGameUpdates || gameState);
+            setGame(data?.listenToGameUpdates ?? gameState);
         }
     }, [data, game, gameState, setGame]);
 
     return children({
         state: game,
-        loading: game === null,
         error,
     });
 };

@@ -9,7 +9,7 @@ import { isNullish } from "remeda";
 
 export type GameContainerProps = Readonly<{ game: GameState }>;
 
-export const GameContainer = ({ game }: GameContainerProps) => {
+export function GameContainer({ game }: GameContainerProps) {
     return (
         <div className="flex flex-col h-full">
             <div className="p-4">
@@ -33,4 +33,4 @@ export const GameContainer = ({ game }: GameContainerProps) => {
             </div>
         </div>
     );
-};
+}

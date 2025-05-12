@@ -1,7 +1,5 @@
-import GameDashboardContainer from "@/game/container/GameDashboardContainer";
+import { GameDashboardContainer } from "@/game/container/GameDashboardContainer";
 
-const GameDashboardPage = async () => {
+export default async function GameDashboardPage() {
     return <GameDashboardContainer />;
-};
-
-export default GameDashboardPage;
+}

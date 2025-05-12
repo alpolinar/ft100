@@ -6,7 +6,7 @@ import { useGameStore } from "../zustand/store";
 import { useEffect, useRef } from "react";
 import { isDeepEqual } from "remeda";
 
-export const GameStateListener = ({
+export function GameStateListener({
     gameState,
     children,
 }: Readonly<{
@@ -17,7 +17,7 @@ export const GameStateListener = ({
             error?: ApolloError;
         }>
     >;
-}>) => {
+}>) {
     const game = useGameStore((state) => state.game);
     const setGame = useGameStore((state) => state.setGame);
 
@@ -52,4 +52,4 @@ export const GameStateListener = ({
         state: game,
         error,
     });
-};
+}

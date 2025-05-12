@@ -8,7 +8,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useGameStore } from "../zustand/store";
 
-const GameDashboardContainer = () => {
+export function GameDashboardContainer() {
     const [gameId, setGameId] = useState("");
     const { setGame } = useGameStore();
 
@@ -43,6 +43,4 @@ const GameDashboardContainer = () => {
             </Link>
         </div>
     );
-};
-
-export default GameDashboardContainer;
+}

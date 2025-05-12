@@ -9,7 +9,7 @@ import {
 
 type GamePageProps = Params<{ gameId: string }>;
 
-const GamePage = async ({ params }: GamePageProps) => {
+export default async function GamePage({ params }: GamePageProps) {
     const { gameId } = await params;
 
     const { data } = await query<
@@ -27,6 +27,4 @@ const GamePage = async ({ params }: GamePageProps) => {
     ) : (
         <div>no data</div>
     );
-};
-
-export default GamePage;
+}

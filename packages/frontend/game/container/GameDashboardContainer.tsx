@@ -6,7 +6,7 @@ import { generateGameId } from "@/utils/helpers";
 import { useCreateGameMutation } from "@ods/server-lib";
 import Link from "next/link";
 import { useState } from "react";
-import { useGameStore } from "../store/store";
+import { useGameStore } from "../zustand/store";
 
 const GameDashboardContainer = () => {
     const [gameId, setGameId] = useState("");

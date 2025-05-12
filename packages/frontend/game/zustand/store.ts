@@ -1,11 +1,10 @@
 import { GameState } from "@ods/server-lib";
 import { create } from "zustand";
-import { devtools } from "zustand/middleware";
-import { persist } from "zustand/middleware";
+import { devtools, persist } from "zustand/middleware";
 
-type Model = Readonly<{
+type Model = {
     game: GameState | null;
-}>;
+};
 
 type Actions = Readonly<{
     setGame: (game: GameState) => void;
@@ -26,7 +25,9 @@ export const useGameStore = create<GameStore>()(
                 removeGame: () => set({ game: null }),
                 setGame: (game) => set({ game }),
             }),
-            { name: "game-state" }
+            {
+                name: "game-state",
+            }
         ),
         { name: "GameStore" }
     )

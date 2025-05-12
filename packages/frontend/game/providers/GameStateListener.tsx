@@ -2,8 +2,9 @@
 
 import { ApolloError } from "@apollo/client";
 import { GameState, useListenToGameUpdatesSubscription } from "@ods/server-lib";
-import { useGameStore } from "../store/store";
-import { useEffect } from "react";
+import { useGameStore } from "../zustand/store";
+import { useEffect, useRef } from "react";
+import { isDeepEqual } from "remeda";
 
 export const GameStateListener = ({
     gameState,
@@ -20,6 +21,8 @@ export const GameStateListener = ({
     const game = useGameStore((state) => state.game);
     const setGame = useGameStore((state) => state.setGame);
 
+    const didInit = useRef(false);
+
     const { data, error } = useListenToGameUpdatesSubscription({
         variables: {
             channelId: gameState.id,
@@ -28,10 +31,22 @@ export const GameStateListener = ({
     });
 
     useEffect(() => {
-        if (!game) {
-            setGame(data?.listenToGameUpdates ?? gameState);
+        if (!didInit.current) {
+            if (!game) {
+                setGame(gameState);
+            }
+            didInit.current = true;
         }
-    }, [data, game, gameState, setGame]);
+    }, [game, gameState, setGame]);
+
+    useEffect(() => {
+        if (
+            data?.listenToGameUpdates &&
+            !isDeepEqual(data.listenToGameUpdates, game)
+        ) {
+            setGame(data.listenToGameUpdates);
+        }
+    }, [data, game, setGame]);
 
     return children({
         state: game,

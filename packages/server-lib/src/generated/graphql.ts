@@ -48,6 +48,11 @@ export type Scalars = {
     Date: { input: Date; output: Date };
 };
 
+export type AuthenticatedUser = {
+    readonly jwt: Scalars["String"]["output"];
+    readonly user: User;
+};
+
 export type GameState = {
     readonly currentPlayerId?: Maybe<Scalars["String"]["output"]>;
     readonly currentTotal: Scalars["Int"]["output"];
@@ -90,7 +95,15 @@ export type InputUpdateUser = {
     readonly email?: InputMaybe<Scalars["String"]["input"]>;
     readonly id: Scalars["String"]["input"];
     readonly img?: InputMaybe<Scalars["String"]["input"]>;
+    readonly lastLoginAt?: InputMaybe<Scalars["Date"]["input"]>;
+    readonly token?: InputMaybe<Scalars["String"]["input"]>;
     readonly username?: InputMaybe<Scalars["String"]["input"]>;
+    readonly verified?: InputMaybe<Scalars["Boolean"]["input"]>;
+};
+
+export type InputValidateToken = {
+    readonly code: Scalars["Int"]["input"];
+    readonly email: Scalars["String"]["input"];
 };
 
 export type Move = {
@@ -104,7 +117,8 @@ export type Mutation = {
     readonly connectPlayer: GameState;
     readonly createGame: GameState;
     readonly sendMove: GameState;
-    readonly signIn: User;
+    readonly validateUserEmail: Scalars["Boolean"]["output"];
+    readonly validateUserToken: AuthenticatedUser;
 };
 
 export type MutationConnectPlayerArgs = {
@@ -119,8 +133,12 @@ export type MutationSendMoveArgs = {
     input: InputMove;
 };
 
-export type MutationSignInArgs = {
+export type MutationValidateUserEmailArgs = {
     email: Scalars["String"]["input"];
+};
+
+export type MutationValidateUserTokenArgs = {
+    input: InputValidateToken;
 };
 
 export type Query = {
@@ -263,6 +281,7 @@ export type DirectiveResolverFn<
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
+    AuthenticatedUser: ResolverTypeWrapper<AuthenticatedUser>;
     Boolean: ResolverTypeWrapper<Scalars["Boolean"]["output"]>;
     Date: ResolverTypeWrapper<Scalars["Date"]["output"]>;
     GameState: ResolverTypeWrapper<GameState>;
@@ -272,6 +291,7 @@ export type ResolversTypes = {
     InputMove: InputMove;
     InputUpdateGame: InputUpdateGame;
     InputUpdateUser: InputUpdateUser;
+    InputValidateToken: InputValidateToken;
     Int: ResolverTypeWrapper<Scalars["Int"]["output"]>;
     Move: ResolverTypeWrapper<Move>;
     Mutation: ResolverTypeWrapper<{}>;
@@ -284,6 +304,7 @@ export type ResolversTypes = {
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
+    AuthenticatedUser: AuthenticatedUser;
     Boolean: Scalars["Boolean"]["output"];
     Date: Scalars["Date"]["output"];
     GameState: GameState;
@@ -293,6 +314,7 @@ export type ResolversParentTypes = {
     InputMove: InputMove;
     InputUpdateGame: InputUpdateGame;
     InputUpdateUser: InputUpdateUser;
+    InputValidateToken: InputValidateToken;
     Int: Scalars["Int"]["output"];
     Move: Move;
     Mutation: {};
@@ -301,6 +323,16 @@ export type ResolversParentTypes = {
     Subscription: {};
     Token: Token;
     User: User;
+};
+
+export type AuthenticatedUserResolvers<
+    ContextType = any,
+    ParentType extends
+        ResolversParentTypes["AuthenticatedUser"] = ResolversParentTypes["AuthenticatedUser"],
+> = {
+    jwt?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+    user?: Resolver<ResolversTypes["User"], ParentType, ContextType>;
+    __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export interface DateScalarConfig
@@ -374,11 +406,17 @@ export type MutationResolvers<
         ContextType,
         RequireFields<MutationSendMoveArgs, "input">
     >;
-    signIn?: Resolver<
-        ResolversTypes["User"],
+    validateUserEmail?: Resolver<
+        ResolversTypes["Boolean"],
         ParentType,
         ContextType,
-        RequireFields<MutationSignInArgs, "email">
+        RequireFields<MutationValidateUserEmailArgs, "email">
+    >;
+    validateUserToken?: Resolver<
+        ResolversTypes["AuthenticatedUser"],
+        ParentType,
+        ContextType,
+        RequireFields<MutationValidateUserTokenArgs, "input">
     >;
 };
 
@@ -445,6 +483,7 @@ export type UserResolvers<
 };
 
 export type Resolvers<ContextType = any> = {
+    AuthenticatedUser?: AuthenticatedUserResolvers<ContextType>;
     Date?: GraphQLScalarType;
     GameState?: GameStateResolvers<ContextType>;
     Move?: MoveResolvers<ContextType>;

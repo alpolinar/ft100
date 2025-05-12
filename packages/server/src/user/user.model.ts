@@ -1,3 +1,5 @@
+import { UpdateOptions } from "sequelize";
+
 export type UserAttributes = Readonly<{
     id: string;
     username: string;

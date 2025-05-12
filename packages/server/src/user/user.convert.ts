@@ -1,5 +1,5 @@
 import { User } from "@ods/server-lib";
-import { UserAttributes } from "./model";
+import { UserAttributes } from "./user.model";
 import { UserEntity } from "./user.entity";
 
 export function getUserAttributes(e: UserEntity): UserAttributes {

@@ -8,8 +8,8 @@ import {
     Table,
     UpdatedAt,
 } from "sequelize-typescript";
-import { getUserAttributes } from "./convert";
-import { UserAttributes } from "./model";
+import { getUserAttributes } from "./user.convert";
+import { UserAttributes } from "./user.model";
 
 export const UserProvider = "USER_PROVIDER" as const;
 

@@ -6,6 +6,7 @@ import {
     InputMove,
     InputUpdateGame,
     InputUpdateUser,
+    InputValidateToken,
 } from "./graphql";
 
 type Properties<T> = Required<{
@@ -74,6 +75,18 @@ export function InputUpdateUserSchema(): z.ZodObject<
         email: z.string().nullish(),
         id: z.string(),
         img: z.string().nullish(),
+        lastLoginAt: z.date().nullish(),
+        token: z.string().nullish(),
         username: z.string().nullish(),
+        verified: z.boolean().nullish(),
+    });
+}
+
+export function InputValidateTokenSchema(): z.ZodObject<
+    Properties<InputValidateToken>
+> {
+    return z.object({
+        code: z.number(),
+        email: z.string(),
     });
 }

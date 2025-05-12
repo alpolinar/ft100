@@ -1,16 +1,14 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
-import { User } from "@ods/server-lib";
-import { Effect, Option, flow, pipe } from "effect";
+import { Effect, Option, flow, pipe as ePipe } from "effect";
 import { catchError } from "src/common/utils/helpers";
 import { EntityOptions } from "../common/utils/type-helpers";
-import { UserAttributes } from "./model";
+import { UserAttributes } from "./user.model";
 import {
     UserCreateAttributes,
     UserEntity,
     UserProvider,
     UserUpdateAttributes,
 } from "./user.entity";
-import { filterEffectOrFail } from "effect/Effect";
 
 export type UserOptions = EntityOptions<UserAttributes>;
 
@@ -23,8 +21,11 @@ export class UserDataAccessLayer {
         private readonly userRepository: typeof UserEntity
     ) {}
 
-    findByPk(id: string, options?: UserOptions) {
-        return pipe(
+    findByPk(
+        id: string,
+        options?: UserOptions
+    ): Effect.Effect<Option.Option<UserAttributes>, Error, never> {
+        return ePipe(
             Effect.tryPromise({
                 try: () => this.userRepository.findByPk(id, options),
                 catch: catchError((err) => {
@@ -33,8 +34,9 @@ export class UserDataAccessLayer {
                     );
                 }),
             }),
-            Effect.map(
-                flow(
+            Effect.map((user) =>
+                ePipe(
+                    user,
                     Option.fromNullable,
                     Option.map((e) => e.getUserAttributes)
                 )
@@ -44,16 +46,17 @@ export class UserDataAccessLayer {
 
     findOne(
         options: UserOptions
-    ): Effect.Effect<Option.Option<User>, Error, never> {
-        return pipe(
+    ): Effect.Effect<Option.Option<UserAttributes>, Error, never> {
+        return ePipe(
             Effect.tryPromise({
                 try: () => this.userRepository.findOne(options),
                 catch: catchError((err) => {
                     this.logger.error(`No user found. Error: ${err.message}`);
                 }),
             }),
-            Effect.map(
-                flow(
+            Effect.map((user) =>
+                ePipe(
+                    user,
                     Option.fromNullable,
                     Option.map((e) => e.getUserAttributes)
                 )
@@ -64,7 +67,7 @@ export class UserDataAccessLayer {
     create(
         values: UserCreateAttributes
     ): Effect.Effect<UserAttributes, Error, never> {
-        return pipe(
+        return ePipe(
             Effect.tryPromise({
                 try: () => this.userRepository.create(values),
                 catch: catchError((err) => {
@@ -78,36 +81,32 @@ export class UserDataAccessLayer {
     }
 
     update(values: UserUpdateAttributes, options?: UserOptions) {
-        return pipe(
+        return ePipe(
             Effect.tryPromise({
                 try: () => this.userRepository.findByPk(values.id, options),
                 catch: catchError((err) => {
                     this.logger.error(`No User Found. ${err.message}`);
                 }),
             }),
-            Effect.flatMap(
-                flow(
+            Effect.flatMap((user) =>
+                ePipe(
+                    user,
                     Option.fromNullable,
                     Option.match({
                         onNone: () => {
-                            const err = new Error("No User Foung");
+                            const err = new Error("No User Found");
                             this.logger.log(err.message);
                             return Effect.fail(err);
                         },
                         onSome: (e) =>
-                            Effect.gen(function* () {
-                                yield* Effect.promise(() =>
-                                    e.update({
-                                        username: values.username,
-                                        email: values.email,
-                                        img: values.img,
-                                        token: values.token,
-                                        verified: values.verified,
-                                        lastLoginAt: values.lastLoginAt,
-                                    })
+                            Effect.gen(function* (_) {
+                                yield* _(
+                                    Effect.promise(() => e.update(values))
                                 );
-                                yield* Effect.promise(() =>
-                                    e.reload({ useMaster: true })
+                                yield* _(
+                                    Effect.promise(() =>
+                                        e.reload({ useMaster: true })
+                                    )
                                 );
                                 return e.getUserAttributes;
                             }),

@@ -15,7 +15,7 @@ import { Sequelize } from "sequelize-typescript";
 import { withTransactionEffect } from "src/common/utils/helpers";
 import { SubscriptionsService } from "../subscriptions/subscriptions.service";
 import { UserEntity } from "../user/user.entity";
-import { convertToGameState } from "./convert";
+import { convertToGameState } from "./game.convert";
 import { GameDataAccessLayer, GameOptions } from "./game.dal";
 
 @Injectable()

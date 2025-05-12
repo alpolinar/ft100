@@ -11,8 +11,8 @@ import {
     UpdatedAt,
 } from "sequelize-typescript";
 import { UserEntity } from "src/user/user.entity";
-import { getGameAttributes } from "./convert";
-import { GameAttributes } from "./model";
+import { getGameAttributes } from "./game.convert";
+import { GameAttributes } from "./game.model";
 
 export const GameProvider = "GAME_PROVIDER" as const;
 

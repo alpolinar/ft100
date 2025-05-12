@@ -1,6 +1,6 @@
 import { GameState } from "@ods/server-lib";
 import { GameEntity } from "./game.entity";
-import { GameAttributes } from "./model";
+import { GameAttributes } from "./game.model";
 
 export function getGameAttributes(e: GameEntity): GameAttributes {
     // TODO: add players state when user module is done

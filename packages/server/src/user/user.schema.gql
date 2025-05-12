@@ -1,3 +1,8 @@
+type AuthenticatedUser {
+    jwt: String!
+    user: User!
+}
+
 type User {
     id: String!
     username: String!
@@ -20,9 +25,18 @@ input InputCreateUser {
 }
 
 input InputUpdateUser {
+    id: String!
     username: String
     email: String
+    verified: Boolean
+    token: String
     img: String
+    lastLoginAt: Date
+}
+
+input InputValidateToken {
+    email: String!
+    code: Int!
 }
 
 fragment User on User {
@@ -35,5 +49,6 @@ fragment User on User {
 }
 
 type Mutation {
-    authenticateUser(email: String!): User!
+    validateUserEmail(email: String!): Boolean!
+    validateUserToken(input: InputValidateToken!): AuthenticatedUser!
 }

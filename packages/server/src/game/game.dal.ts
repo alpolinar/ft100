@@ -8,7 +8,7 @@ import {
     GameProvider,
     GameUpdateAttributes,
 } from "./game.entity";
-import { GameAttributes } from "./model";
+import { GameAttributes } from "./game.model";
 
 export type GameOptions = EntityOptions<GameAttributes>;
 

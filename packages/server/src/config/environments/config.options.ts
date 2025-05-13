@@ -16,6 +16,11 @@ export const envSchema = z.object({
     npm_package_version: z.string(),
     HMAC_KEY: z.string(),
     ENCRYPT_KEY: z.string(),
+    JWT_SECRET: z.string(),
+    APP_ENV: z
+        .enum(["development", "stage", "production"])
+        .optional()
+        .default("development"),
 });
 
 export const configOptions: ConfigModuleOptions = {

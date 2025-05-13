@@ -1,7 +1,6 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
-import { Effect, Option, flow, pipe as ePipe } from "effect";
+import { Effect, Option, pipe as ePipe } from "effect";
 import { catchError } from "src/common/utils/helpers";
-import { EntityOptions } from "../common/utils/type-helpers";
 import { UserAttributes } from "./user.model";
 import {
     UserCreateAttributes,
@@ -9,8 +8,10 @@ import {
     UserProvider,
     UserUpdateAttributes,
 } from "./user.entity";
+import { FindOptions } from "sequelize";
+import { map } from "remeda";
 
-export type UserOptions = EntityOptions<UserAttributes>;
+export type FindUserOptions = FindOptions<UserAttributes>;
 
 @Injectable()
 export class UserDataAccessLayer {
@@ -23,7 +24,7 @@ export class UserDataAccessLayer {
 
     findByPk(
         id: string,
-        options?: UserOptions
+        options?: FindUserOptions
     ): Effect.Effect<Option.Option<UserAttributes>, Error, never> {
         return ePipe(
             Effect.tryPromise({
@@ -45,7 +46,8 @@ export class UserDataAccessLayer {
     }
 
     findOne(
-        options: UserOptions
+        options: Omit<FindUserOptions, "where"> &
+            Required<Pick<FindUserOptions, "where">>
     ): Effect.Effect<Option.Option<UserAttributes>, Error, never> {
         return ePipe(
             Effect.tryPromise({
@@ -61,6 +63,20 @@ export class UserDataAccessLayer {
                     Option.map((e) => e.getUserAttributes)
                 )
             )
+        );
+    }
+
+    findAll(
+        options?: FindUserOptions
+    ): Effect.Effect<ReadonlyArray<UserAttributes>, Error, never> {
+        return ePipe(
+            Effect.tryPromise({
+                try: () => this.userRepository.findAll(options),
+                catch: catchError((err) => {
+                    this.logger.log(`No Users Found: ${err.message}`);
+                }),
+            }),
+            Effect.map((entity) => map(entity, (e) => e.getUserAttributes))
         );
     }
 
@@ -80,7 +96,10 @@ export class UserDataAccessLayer {
         );
     }
 
-    update(values: UserUpdateAttributes, options?: UserOptions) {
+    update(
+        values: UserUpdateAttributes,
+        options?: FindUserOptions
+    ): Effect.Effect<UserAttributes, Error, never> {
         return ePipe(
             Effect.tryPromise({
                 try: () => this.userRepository.findByPk(values.id, options),

@@ -1,11 +1,12 @@
+import { randomInt } from "node:crypto";
 import { Inject, Injectable, Logger } from "@nestjs/common";
-import { UserDataAccessLayer, UserOptions } from "./user.dal";
-import { Effect, Option, pipe as ePipe } from "effect";
-import { InputCreateUser, InputUpdateUser, Token, User } from "@ods/server-lib";
+import { Token, User } from "@ods/server-lib";
+import { Effect, Option } from "effect";
+import { pipe as ePipe } from "effect/Function";
 import { AppConfigService } from "../app-config/app.config.service";
 import { CryptoService } from "../common/utils/crypto";
-import { randomInt } from "node:crypto";
 import { convertToUser } from "./user.convert";
+import { FindUserOptions, UserDataAccessLayer } from "./user.dal";
 
 @Injectable()
 export class UserService {
@@ -24,7 +25,7 @@ export class UserService {
 
     findUserById(
         id: string,
-        options?: UserOptions
+        options?: FindUserOptions
     ): Effect.Effect<User, Error, never> {
         return ePipe(
             this.userDal.findByPk(id, options),
@@ -42,14 +43,11 @@ export class UserService {
     }
 
     findUser(
-        where: Pick<UserOptions, "where">,
-        options?: Omit<UserOptions, "where">
+        options: Omit<FindUserOptions, "where"> &
+            Required<Pick<FindUserOptions, "where">>
     ): Effect.Effect<User, Error, never> {
         return ePipe(
-            this.userDal.findOne({
-                ...options,
-                where,
-            }),
+            this.userDal.findOne(options),
             Effect.flatMap(
                 Option.match({
                     onNone: () => {
@@ -63,19 +61,38 @@ export class UserService {
         );
     }
 
-    createUser(input: InputCreateUser): Effect.Effect<User, Error, never> {
+    createUser(
+        input: Readonly<{
+            email?: string;
+            verified?: boolean;
+            token?: string;
+            img?: string;
+            lastLoginAt?: Date;
+        }>
+    ): Effect.Effect<User, Error, never> {
         return ePipe(
             this.userDal.create({
-                username: input.username,
-                verified: false,
+                verified: input.verified ?? false,
                 email: input.email,
                 img: input.img,
+                token: input.token,
+                lastLoginAt: input.lastLoginAt,
             }),
             Effect.map((user) => convertToUser(user))
         );
     }
 
-    updateUser(input: InputUpdateUser) {
+    updateUser(
+        input: Readonly<{
+            id: string;
+            username?: string;
+            email?: string;
+            verified?: boolean;
+            token?: string;
+            img?: string;
+            lastLoginAt?: Date;
+        }>
+    ): Effect.Effect<User, Error, never> {
         return ePipe(
             this.userDal.update({
                 id: input.id,
@@ -90,15 +107,20 @@ export class UserService {
         );
     }
 
-    generateToken(
-        userId: string
-    ): Effect.Effect<{ code: number; token: string }, Error, never> {
+    generateToken(): Effect.Effect<
+        { code: number; token: string },
+        Error,
+        never
+    > {
         const code = randomInt(100_000, 1_000_000);
         const expiryDate = new Date(
             Date.now() + 5 * 60 * 1000 //5 minutes
         );
+        if (this.appConfig.get("APP_ENV") === "development") {
+            this.logger.log(`User Token: ${code}`);
+        }
         return ePipe(
-            this.encryptor.encrypt({ userId, code, expiryDate }),
+            this.encryptor.encrypt({ code, expiryDate }),
             Effect.map((token) => ({ code, token }))
         );
     }
@@ -108,9 +130,11 @@ export class UserService {
         submittedCode: number
     ): Effect.Effect<boolean, Error, never> {
         return ePipe(
-            token,
-            this.encryptor.decrypt,
-            Effect.map(({ code }) => code === submittedCode)
+            this.encryptor.decrypt(token),
+            Effect.map(
+                ({ code, expiryDate }) =>
+                    code === submittedCode && expiryDate > new Date()
+            )
         );
     }
 
@@ -123,7 +147,7 @@ export class UserService {
             }),
             Effect.flatMap((user) =>
                 ePipe(
-                    this.generateToken(user.id),
+                    this.generateToken(),
                     Effect.flatMap(({ token }) =>
                         this.updateUser({
                             id: user.id,
@@ -141,6 +165,24 @@ export class UserService {
             Effect.catchAll((err) => {
                 this.logger.error(err.message);
                 return Effect.succeed(false);
+            })
+        );
+    }
+
+    registerUser(
+        input: Readonly<{ email: string; img?: string }>
+    ): Effect.Effect<boolean, Error, never> {
+        return ePipe(
+            this.generateToken(),
+            Effect.flatMap(({ token }) =>
+                this.createUser({ email: input.email, img: input.img, token })
+            ),
+            Effect.match({
+                onFailure: (err) => {
+                    this.logger.error(err.message);
+                    return false;
+                },
+                onSuccess: () => true,
             })
         );
     }

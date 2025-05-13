@@ -1,7 +1,13 @@
 import { Args, Mutation, Resolver } from "@nestjs/graphql";
-import { UserService } from "./user.service";
-import { AuthService } from "./auth.service";
+import {
+    AuthenticatedUser,
+    InputCreateUser,
+    InputValidateEmail,
+    InputValidateToken,
+} from "@ods/server-lib";
 import { Effect } from "effect/index";
+import { AuthService } from "./auth.service";
+import { UserService } from "./user.service";
 
 @Resolver()
 export class UserResolver {
@@ -10,10 +16,28 @@ export class UserResolver {
         private readonly authService: AuthService
     ) {}
 
+    @Mutation("registerUser")
+    async registerUser(
+        @Args("input") input: InputCreateUser
+    ): Promise<boolean> {
+        return await Effect.runPromise(this.userService.registerUser(input));
+    }
+
     @Mutation("validateUserEmail")
-    async validateUserEmail(@Args("email") email: string): Promise<boolean> {
+    async validateUserEmail(
+        @Args("input") input: InputValidateEmail
+    ): Promise<boolean> {
         return await Effect.runPromise(
-            this.userService.validateUserEmail(email)
+            this.userService.validateUserEmail(input.email)
+        );
+    }
+
+    @Mutation("validateUserToken")
+    async validateUserToken(
+        @Args("input") input: InputValidateToken
+    ): Promise<AuthenticatedUser> {
+        return await Effect.runPromise(
+            this.authService.validateUserToken(input.email, input.code)
         );
     }
 }

@@ -6,6 +6,7 @@ import {
     InputMove,
     InputUpdateGame,
     InputUpdateUser,
+    InputValidateEmail,
     InputValidateToken,
 } from "./graphql";
 
@@ -42,9 +43,8 @@ export function InputCreateUserSchema(): z.ZodObject<
     Properties<InputCreateUser>
 > {
     return z.object({
-        email: z.string().nullish(),
+        email: z.string(),
         img: z.string().nullish(),
-        username: z.string(),
     });
 }
 
@@ -79,6 +79,14 @@ export function InputUpdateUserSchema(): z.ZodObject<
         token: z.string().nullish(),
         username: z.string().nullish(),
         verified: z.boolean().nullish(),
+    });
+}
+
+export function InputValidateEmailSchema(): z.ZodObject<
+    Properties<InputValidateEmail>
+> {
+    return z.object({
+        email: z.string(),
     });
 }
 

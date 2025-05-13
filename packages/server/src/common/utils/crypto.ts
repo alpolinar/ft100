@@ -1,5 +1,3 @@
-import { BadRequestException, Logger } from "@nestjs/common";
-import { Effect, Option } from "effect";
 import {
     CipherGCMTypes,
     createCipheriv,
@@ -7,6 +5,8 @@ import {
     createHmac,
     randomBytes,
 } from "node:crypto";
+import { Logger } from "@nestjs/common";
+import { Effect } from "effect";
 import { catchError } from "./helpers";
 
 export class CryptoService<T> {

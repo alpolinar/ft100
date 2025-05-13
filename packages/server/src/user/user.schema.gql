@@ -9,18 +9,17 @@ type User {
     email: String
     verified: Boolean!
     img: String
+    token: String
     lastLoginAt: Date
 }
 
 type Token {
-    userId: String!
     code: Int!
     expiryDate: Date!
 }
 
 input InputCreateUser {
-    username: String!
-    email: String
+    email: String!
     img: String
 }
 
@@ -32,6 +31,10 @@ input InputUpdateUser {
     token: String
     img: String
     lastLoginAt: Date
+}
+
+input InputValidateEmail {
+    email: String!
 }
 
 input InputValidateToken {
@@ -48,7 +51,29 @@ fragment User on User {
     lastLoginAt
 }
 
+fragment AuthenticatedUser on AuthenticatedUser {
+    jwt
+    user {
+        ...User
+    }
+}
+
 type Mutation {
-    validateUserEmail(email: String!): Boolean!
+    registerUser(input: InputCreateUser!): Boolean!
+    validateUserEmail(input: InputValidateEmail!): Boolean!
     validateUserToken(input: InputValidateToken!): AuthenticatedUser!
+}
+
+mutation registerUser($input: InputCreateUser!) {
+    registerUser(input: $input)
+}
+
+mutation validateUserEmail($input: InputValidateEmail!) {
+    validateUserEmail(input: $input)
+}
+
+mutation validateUserToken($input: InputValidateToken!) {
+    validateUserToken(input: $input) {
+        ...AuthenticatedUser
+    }
 }

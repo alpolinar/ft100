@@ -24,6 +24,7 @@ export function convertToUser(data: UserAttributes): User {
         verified: data.verified,
         email: data.email,
         img: data.img,
+        token: data.token,
         lastLoginAt: data.lastLoginAt,
     };
 }

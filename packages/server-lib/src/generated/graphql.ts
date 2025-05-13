@@ -72,9 +72,8 @@ export type InputCreateGame = {
 };
 
 export type InputCreateUser = {
-    readonly email?: InputMaybe<Scalars["String"]["input"]>;
+    readonly email: Scalars["String"]["input"];
     readonly img?: InputMaybe<Scalars["String"]["input"]>;
-    readonly username: Scalars["String"]["input"];
 };
 
 export type InputMove = {
@@ -101,6 +100,10 @@ export type InputUpdateUser = {
     readonly verified?: InputMaybe<Scalars["Boolean"]["input"]>;
 };
 
+export type InputValidateEmail = {
+    readonly email: Scalars["String"]["input"];
+};
+
 export type InputValidateToken = {
     readonly code: Scalars["Int"]["input"];
     readonly email: Scalars["String"]["input"];
@@ -116,6 +119,7 @@ export type Move = {
 export type Mutation = {
     readonly connectPlayer: GameState;
     readonly createGame: GameState;
+    readonly registerUser: Scalars["Boolean"]["output"];
     readonly sendMove: GameState;
     readonly validateUserEmail: Scalars["Boolean"]["output"];
     readonly validateUserToken: AuthenticatedUser;
@@ -129,12 +133,16 @@ export type MutationCreateGameArgs = {
     input: InputCreateGame;
 };
 
+export type MutationRegisterUserArgs = {
+    input: InputCreateUser;
+};
+
 export type MutationSendMoveArgs = {
     input: InputMove;
 };
 
 export type MutationValidateUserEmailArgs = {
-    email: Scalars["String"]["input"];
+    input: InputValidateEmail;
 };
 
 export type MutationValidateUserTokenArgs = {
@@ -162,7 +170,6 @@ export type SubscriptionListenToGameUpdatesArgs = {
 export type Token = {
     readonly code: Scalars["Int"]["output"];
     readonly expiryDate: Scalars["Date"]["output"];
-    readonly userId: Scalars["String"]["output"];
 };
 
 export type User = {
@@ -170,6 +177,7 @@ export type User = {
     readonly id: Scalars["String"]["output"];
     readonly img?: Maybe<Scalars["String"]["output"]>;
     readonly lastLoginAt?: Maybe<Scalars["Date"]["output"]>;
+    readonly token?: Maybe<Scalars["String"]["output"]>;
     readonly username: Scalars["String"]["output"];
     readonly verified: Scalars["Boolean"]["output"];
 };
@@ -291,6 +299,7 @@ export type ResolversTypes = {
     InputMove: InputMove;
     InputUpdateGame: InputUpdateGame;
     InputUpdateUser: InputUpdateUser;
+    InputValidateEmail: InputValidateEmail;
     InputValidateToken: InputValidateToken;
     Int: ResolverTypeWrapper<Scalars["Int"]["output"]>;
     Move: ResolverTypeWrapper<Move>;
@@ -314,6 +323,7 @@ export type ResolversParentTypes = {
     InputMove: InputMove;
     InputUpdateGame: InputUpdateGame;
     InputUpdateUser: InputUpdateUser;
+    InputValidateEmail: InputValidateEmail;
     InputValidateToken: InputValidateToken;
     Int: Scalars["Int"]["output"];
     Move: Move;
@@ -400,6 +410,12 @@ export type MutationResolvers<
         ContextType,
         RequireFields<MutationCreateGameArgs, "input">
     >;
+    registerUser?: Resolver<
+        ResolversTypes["Boolean"],
+        ParentType,
+        ContextType,
+        RequireFields<MutationRegisterUserArgs, "input">
+    >;
     sendMove?: Resolver<
         ResolversTypes["GameState"],
         ParentType,
@@ -410,7 +426,7 @@ export type MutationResolvers<
         ResolversTypes["Boolean"],
         ParentType,
         ContextType,
-        RequireFields<MutationValidateUserEmailArgs, "email">
+        RequireFields<MutationValidateUserEmailArgs, "input">
     >;
     validateUserToken?: Resolver<
         ResolversTypes["AuthenticatedUser"],
@@ -460,7 +476,6 @@ export type TokenResolvers<
 > = {
     code?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
     expiryDate?: Resolver<ResolversTypes["Date"], ParentType, ContextType>;
-    userId?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
     __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -477,6 +492,7 @@ export type UserResolvers<
         ParentType,
         ContextType
     >;
+    token?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
     username?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
     verified?: Resolver<ResolversTypes["Boolean"], ParentType, ContextType>;
     __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -611,6 +627,48 @@ export type UserFragment = {
     readonly lastLoginAt?: Date | undefined | null;
 };
 
+export type AuthenticatedUserFragment = {
+    readonly jwt: string;
+    readonly user: {
+        readonly id: string;
+        readonly username: string;
+        readonly email?: string | undefined | null;
+        readonly verified: boolean;
+        readonly img?: string | undefined | null;
+        readonly lastLoginAt?: Date | undefined | null;
+    };
+};
+
+export type RegisterUserMutationVariables = Exact<{
+    input: InputCreateUser;
+}>;
+
+export type RegisterUserMutation = { readonly registerUser: boolean };
+
+export type ValidateUserEmailMutationVariables = Exact<{
+    input: InputValidateEmail;
+}>;
+
+export type ValidateUserEmailMutation = { readonly validateUserEmail: boolean };
+
+export type ValidateUserTokenMutationVariables = Exact<{
+    input: InputValidateToken;
+}>;
+
+export type ValidateUserTokenMutation = {
+    readonly validateUserToken: {
+        readonly jwt: string;
+        readonly user: {
+            readonly id: string;
+            readonly username: string;
+            readonly email?: string | undefined | null;
+            readonly verified: boolean;
+            readonly img?: string | undefined | null;
+            readonly lastLoginAt?: Date | undefined | null;
+        };
+    };
+};
+
 export const GameStateFragmentDoc = gql`
     fragment GameState on GameState {
   id
@@ -632,6 +690,14 @@ export const UserFragmentDoc = gql`
   lastLoginAt
 }
     `;
+export const AuthenticatedUserFragmentDoc = gql`
+    fragment AuthenticatedUser on AuthenticatedUser {
+  jwt
+  user {
+    ...User
+  }
+}
+    ${UserFragmentDoc}`;
 export const HealthcheckDocument = gql`
     query healthcheck {
   healthcheck
@@ -1059,3 +1125,149 @@ export type ListenToGameUpdatesSubscriptionHookResult = ReturnType<
 >;
 export type ListenToGameUpdatesSubscriptionResult =
     Apollo.SubscriptionResult<ListenToGameUpdatesSubscription>;
+export const RegisterUserDocument = gql`
+    mutation registerUser($input: InputCreateUser!) {
+  registerUser(input: $input)
+}
+    `;
+export type RegisterUserMutationFn = Apollo.MutationFunction<
+    RegisterUserMutation,
+    RegisterUserMutationVariables
+>;
+
+/**
+ * __useRegisterUserMutation__
+ *
+ * To run a mutation, you first call `useRegisterUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRegisterUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [registerUserMutation, { data, loading, error }] = useRegisterUserMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useRegisterUserMutation(
+    baseOptions?: Apollo.MutationHookOptions<
+        RegisterUserMutation,
+        RegisterUserMutationVariables
+    >
+) {
+    const options = { ...defaultOptions, ...baseOptions };
+    return Apollo.useMutation<
+        RegisterUserMutation,
+        RegisterUserMutationVariables
+    >(RegisterUserDocument, options);
+}
+export type RegisterUserMutationHookResult = ReturnType<
+    typeof useRegisterUserMutation
+>;
+export type RegisterUserMutationResult =
+    Apollo.MutationResult<RegisterUserMutation>;
+export type RegisterUserMutationOptions = Apollo.BaseMutationOptions<
+    RegisterUserMutation,
+    RegisterUserMutationVariables
+>;
+export const ValidateUserEmailDocument = gql`
+    mutation validateUserEmail($input: InputValidateEmail!) {
+  validateUserEmail(input: $input)
+}
+    `;
+export type ValidateUserEmailMutationFn = Apollo.MutationFunction<
+    ValidateUserEmailMutation,
+    ValidateUserEmailMutationVariables
+>;
+
+/**
+ * __useValidateUserEmailMutation__
+ *
+ * To run a mutation, you first call `useValidateUserEmailMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useValidateUserEmailMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [validateUserEmailMutation, { data, loading, error }] = useValidateUserEmailMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useValidateUserEmailMutation(
+    baseOptions?: Apollo.MutationHookOptions<
+        ValidateUserEmailMutation,
+        ValidateUserEmailMutationVariables
+    >
+) {
+    const options = { ...defaultOptions, ...baseOptions };
+    return Apollo.useMutation<
+        ValidateUserEmailMutation,
+        ValidateUserEmailMutationVariables
+    >(ValidateUserEmailDocument, options);
+}
+export type ValidateUserEmailMutationHookResult = ReturnType<
+    typeof useValidateUserEmailMutation
+>;
+export type ValidateUserEmailMutationResult =
+    Apollo.MutationResult<ValidateUserEmailMutation>;
+export type ValidateUserEmailMutationOptions = Apollo.BaseMutationOptions<
+    ValidateUserEmailMutation,
+    ValidateUserEmailMutationVariables
+>;
+export const ValidateUserTokenDocument = gql`
+    mutation validateUserToken($input: InputValidateToken!) {
+  validateUserToken(input: $input) {
+    ...AuthenticatedUser
+  }
+}
+    ${AuthenticatedUserFragmentDoc}`;
+export type ValidateUserTokenMutationFn = Apollo.MutationFunction<
+    ValidateUserTokenMutation,
+    ValidateUserTokenMutationVariables
+>;
+
+/**
+ * __useValidateUserTokenMutation__
+ *
+ * To run a mutation, you first call `useValidateUserTokenMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useValidateUserTokenMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [validateUserTokenMutation, { data, loading, error }] = useValidateUserTokenMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useValidateUserTokenMutation(
+    baseOptions?: Apollo.MutationHookOptions<
+        ValidateUserTokenMutation,
+        ValidateUserTokenMutationVariables
+    >
+) {
+    const options = { ...defaultOptions, ...baseOptions };
+    return Apollo.useMutation<
+        ValidateUserTokenMutation,
+        ValidateUserTokenMutationVariables
+    >(ValidateUserTokenDocument, options);
+}
+export type ValidateUserTokenMutationHookResult = ReturnType<
+    typeof useValidateUserTokenMutation
+>;
+export type ValidateUserTokenMutationResult =
+    Apollo.MutationResult<ValidateUserTokenMutation>;
+export type ValidateUserTokenMutationOptions = Apollo.BaseMutationOptions<
+    ValidateUserTokenMutation,
+    ValidateUserTokenMutationVariables
+>;

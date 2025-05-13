@@ -15,7 +15,7 @@ export const UserProvider = "USER_PROVIDER" as const;
 
 export type UserCreateAttributes = Omit<
     UserAttributes,
-    "id" | "createdAt" | "updatedAt" | "deletedAt"
+    "id" | "username" | "createdAt" | "updatedAt" | "deletedAt"
 >;
 
 export type UserUpdateAttributes = Omit<

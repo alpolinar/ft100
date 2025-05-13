@@ -1,9 +1,10 @@
 import { Injectable, Logger } from "@nestjs/common";
+import { JwtService } from "@nestjs/jwt";
 import { AuthenticatedUser } from "@ods/server-lib";
 import { pipe } from "effect/Function";
-import { Effect } from "effect/index";
+import { Effect } from "effect";
+import { genUserJwtPayload } from "./jwt-payload";
 import { UserService } from "./user.service";
-import { JwtService } from "@nestjs/jwt";
 
 @Injectable()
 export class AuthService {
@@ -42,7 +43,9 @@ export class AuthService {
                             return Effect.fail(err);
                         }
                         return Effect.succeed({
-                            jwt: this.jwtService.sign({ userId: user.id }),
+                            jwt: this.jwtService.sign(
+                                genUserJwtPayload({ userId: user.id })
+                            ),
                             user: user,
                         });
                     })

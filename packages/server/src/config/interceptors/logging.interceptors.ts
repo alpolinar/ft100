@@ -11,8 +11,8 @@ import { GqlExecutionContext } from "@nestjs/graphql";
 import { Effect } from "effect";
 import { Observable } from "rxjs";
 import { tap } from "rxjs/operators";
-import { AppConfigService } from "src/app-config/app.config.service";
-import { getOpts } from "src/common/utils/request";
+import { AppConfigService } from "../../app-config/app.config.service";
+import { getOpts } from "../../common/utils/request";
 
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {

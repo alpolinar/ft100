@@ -1,5 +1,5 @@
 import { ExecutionContext } from "@nestjs/common";
-import { GqlContextType } from "@nestjs/graphql";
+import { GqlContextType, GqlExecutionContext } from "@nestjs/graphql";
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
@@ -45,3 +45,13 @@ export const getOpts = (context: ExecutionContext, traceId?: string) => {
         }),
     });
 };
+
+export function isGraphqlRequest(context: ExecutionContext): boolean {
+    return context.getType<GqlContextType>() === "graphql";
+}
+
+export function getRequest(context: ExecutionContext) {
+    return isGraphqlRequest(context)
+        ? GqlExecutionContext.create(context).getContext().req
+        : context.switchToHttp().getRequest();
+}

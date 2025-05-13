@@ -8,6 +8,8 @@ import {
 import { Effect } from "effect/index";
 import { AuthService } from "./auth.service";
 import { UserService } from "./user.service";
+import { CurrentUser } from "../common/decorators/current-user.decorator";
+import { UserStrategyReturnType } from "../common/types/auth-types";
 
 @Resolver()
 export class UserResolver {
@@ -25,8 +27,10 @@ export class UserResolver {
 
     @Mutation("validateUserEmail")
     async validateUserEmail(
-        @Args("input") input: InputValidateEmail
+        @Args("input") input: InputValidateEmail,
+        @CurrentUser() currentUser: UserStrategyReturnType
     ): Promise<boolean> {
+        console.log("currentUser", currentUser);
         return await Effect.runPromise(
             this.userService.validateUserEmail(input.email)
         );

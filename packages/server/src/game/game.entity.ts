@@ -10,7 +10,7 @@ import {
     Table,
     UpdatedAt,
 } from "sequelize-typescript";
-import { UserEntity } from "src/user/user.entity";
+import { UserEntity } from "../user/user.entity";
 import { getGameAttributes } from "./game.convert";
 import { GameAttributes } from "./game.model";
 

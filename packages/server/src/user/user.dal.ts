@@ -1,15 +1,15 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import { Effect, Option, pipe as ePipe } from "effect";
-import { catchError } from "src/common/utils/helpers";
-import { UserAttributes } from "./user.model";
+import { map } from "remeda";
+import { FindOptions } from "sequelize";
+import { catchError } from "../common/utils/helpers";
 import {
     UserCreateAttributes,
     UserEntity,
     UserProvider,
     UserUpdateAttributes,
 } from "./user.entity";
-import { FindOptions } from "sequelize";
-import { map } from "remeda";
+import { UserAttributes } from "./user.model";
 
 export type FindUserOptions = FindOptions<UserAttributes>;
 

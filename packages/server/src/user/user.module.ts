@@ -1,16 +1,19 @@
 import { Module } from "@nestjs/common";
-import { UserService } from "./user.service";
-import { SubscriptionsModule } from "src/subscriptions/subscriptions.module";
-import { userProvider } from "./user.provider";
-import { UserResolver } from "./user.resolver";
-import { UserDataAccessLayer } from "./user.dal";
+import { JwtModule } from "@nestjs/jwt";
+import { PassportModule } from "@nestjs/passport";
+import { SubscriptionsModule } from "../subscriptions/subscriptions.module";
+import { AppConfigModule } from "../app-config/app.config.module";
 import { AppConfigService } from "../app-config/app.config.service";
 import { AuthService } from "./auth.service";
-import { JwtModule } from "@nestjs/jwt";
-import { AppConfigModule } from "../app-config/app.config.module";
+import { UserDataAccessLayer } from "./user.dal";
+import { userProvider } from "./user.provider";
+import { UserResolver } from "./user.resolver";
+import { UserService } from "./user.service";
+import { JwtStrategy } from "./jwt.strategy";
 
 @Module({
     imports: [
+        PassportModule,
         SubscriptionsModule,
         JwtModule.registerAsync({
             imports: [AppConfigModule],
@@ -30,6 +33,7 @@ import { AppConfigModule } from "../app-config/app.config.module";
         UserDataAccessLayer,
         AppConfigService,
         AuthService,
+        JwtStrategy,
     ],
     exports: [UserService],
 })

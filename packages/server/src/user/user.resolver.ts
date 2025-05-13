@@ -1,4 +1,4 @@
-import { Args, Mutation, Resolver } from "@nestjs/graphql";
+import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import {
     AuthenticatedUser,
     InputCreateUser,
@@ -10,6 +10,8 @@ import { AuthService } from "./auth.service";
 import { UserService } from "./user.service";
 import { CurrentUser } from "../common/decorators/current-user.decorator";
 import { UserStrategyReturnType } from "../common/types/auth-types";
+import { UseGuards } from "@nestjs/common";
+import { AuthGuard } from "../common/guards/auth.guard";
 
 @Resolver()
 export class UserResolver {
@@ -27,10 +29,8 @@ export class UserResolver {
 
     @Mutation("validateUserEmail")
     async validateUserEmail(
-        @Args("input") input: InputValidateEmail,
-        @CurrentUser() currentUser: UserStrategyReturnType
+        @Args("input") input: InputValidateEmail
     ): Promise<boolean> {
-        console.log("currentUser", currentUser);
         return await Effect.runPromise(
             this.userService.validateUserEmail(input.email)
         );
@@ -43,5 +43,13 @@ export class UserResolver {
         return await Effect.runPromise(
             this.authService.validateUserToken(input.email, input.code)
         );
+    }
+
+    @UseGuards(AuthGuard)
+    @Query("validateJwt")
+    async validateJwt(
+        @CurrentUser() currentUser: UserStrategyReturnType
+    ): Promise<AuthenticatedUser> {
+        return Effect.runSync(this.authService.validateJwt(currentUser.user));
     }
 }

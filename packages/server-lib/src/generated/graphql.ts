@@ -153,6 +153,7 @@ export type Query = {
     readonly fetchAllUserGames: ReadonlyArray<GameState>;
     readonly fetchGameState: GameState;
     readonly healthcheck: Scalars["String"]["output"];
+    readonly validateJwt?: Maybe<AuthenticatedUser>;
 };
 
 export type QueryFetchGameStateArgs = {
@@ -453,6 +454,11 @@ export type QueryResolvers<
         RequireFields<QueryFetchGameStateArgs, "id">
     >;
     healthcheck?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+    validateJwt?: Resolver<
+        Maybe<ResolversTypes["AuthenticatedUser"]>,
+        ParentType,
+        ContextType
+    >;
 };
 
 export type SubscriptionResolvers<
@@ -637,6 +643,25 @@ export type AuthenticatedUserFragment = {
         readonly img?: string | undefined | null;
         readonly lastLoginAt?: Date | undefined | null;
     };
+};
+
+export type ValidateJwtQueryVariables = Exact<{ [key: string]: never }>;
+
+export type ValidateJwtQuery = {
+    readonly validateJwt?:
+        | {
+              readonly jwt: string;
+              readonly user: {
+                  readonly id: string;
+                  readonly username: string;
+                  readonly email?: string | undefined | null;
+                  readonly verified: boolean;
+                  readonly img?: string | undefined | null;
+                  readonly lastLoginAt?: Date | undefined | null;
+              };
+          }
+        | undefined
+        | null;
 };
 
 export type RegisterUserMutationVariables = Exact<{
@@ -1125,6 +1150,81 @@ export type ListenToGameUpdatesSubscriptionHookResult = ReturnType<
 >;
 export type ListenToGameUpdatesSubscriptionResult =
     Apollo.SubscriptionResult<ListenToGameUpdatesSubscription>;
+export const ValidateJwtDocument = gql`
+    query validateJwt {
+  validateJwt {
+    ...AuthenticatedUser
+  }
+}
+    ${AuthenticatedUserFragmentDoc}`;
+
+/**
+ * __useValidateJwtQuery__
+ *
+ * To run a query within a React component, call `useValidateJwtQuery` and pass it any options that fit your needs.
+ * When your component renders, `useValidateJwtQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useValidateJwtQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useValidateJwtQuery(
+    baseOptions?: Apollo.QueryHookOptions<
+        ValidateJwtQuery,
+        ValidateJwtQueryVariables
+    >
+) {
+    const options = { ...defaultOptions, ...baseOptions };
+    return Apollo.useQuery<ValidateJwtQuery, ValidateJwtQueryVariables>(
+        ValidateJwtDocument,
+        options
+    );
+}
+export function useValidateJwtLazyQuery(
+    baseOptions?: Apollo.LazyQueryHookOptions<
+        ValidateJwtQuery,
+        ValidateJwtQueryVariables
+    >
+) {
+    const options = { ...defaultOptions, ...baseOptions };
+    return Apollo.useLazyQuery<ValidateJwtQuery, ValidateJwtQueryVariables>(
+        ValidateJwtDocument,
+        options
+    );
+}
+export function useValidateJwtSuspenseQuery(
+    baseOptions?:
+        | Apollo.SkipToken
+        | Apollo.SuspenseQueryHookOptions<
+              ValidateJwtQuery,
+              ValidateJwtQueryVariables
+          >
+) {
+    const options =
+        baseOptions === Apollo.skipToken
+            ? baseOptions
+            : { ...defaultOptions, ...baseOptions };
+    return Apollo.useSuspenseQuery<ValidateJwtQuery, ValidateJwtQueryVariables>(
+        ValidateJwtDocument,
+        options
+    );
+}
+export type ValidateJwtQueryHookResult = ReturnType<typeof useValidateJwtQuery>;
+export type ValidateJwtLazyQueryHookResult = ReturnType<
+    typeof useValidateJwtLazyQuery
+>;
+export type ValidateJwtSuspenseQueryHookResult = ReturnType<
+    typeof useValidateJwtSuspenseQuery
+>;
+export type ValidateJwtQueryResult = Apollo.QueryResult<
+    ValidateJwtQuery,
+    ValidateJwtQueryVariables
+>;
 export const RegisterUserDocument = gql`
     mutation registerUser($input: InputCreateUser!) {
   registerUser(input: $input)

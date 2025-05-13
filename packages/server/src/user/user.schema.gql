@@ -58,6 +58,16 @@ fragment AuthenticatedUser on AuthenticatedUser {
     }
 }
 
+type Query {
+    validateJwt: AuthenticatedUser
+}
+
+query validateJwt {
+    validateJwt {
+        ...AuthenticatedUser
+    }
+}
+
 type Mutation {
     registerUser(input: InputCreateUser!): Boolean!
     validateUserEmail(input: InputValidateEmail!): Boolean!

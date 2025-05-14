@@ -36,6 +36,8 @@
         "sonner": "^2.0.3",
         "tailwind-merge": "^3.2.0",
         "ts-pattern": "^5.7.0",
+        "universal-cookie": "^8.0.1",
+        "uuid": "^11.1.0",
         "zod": "^3.24.3",
         "zustand": "^5.0.4"
     },

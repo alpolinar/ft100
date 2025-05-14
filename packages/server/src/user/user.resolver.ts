@@ -1,3 +1,4 @@
+import { UseGuards } from "@nestjs/common";
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import {
     AuthenticatedUser,
@@ -6,12 +7,11 @@ import {
     InputValidateToken,
 } from "@ods/server-lib";
 import { Effect } from "effect/index";
+import { CurrentUser } from "../common/decorators/current-user.decorator";
+import { AuthGuard } from "../common/guards/auth.guard";
+import { UserStrategyReturnType } from "../common/types/auth-types";
 import { AuthService } from "./auth.service";
 import { UserService } from "./user.service";
-import { CurrentUser } from "../common/decorators/current-user.decorator";
-import { UserStrategyReturnType } from "../common/types/auth-types";
-import { UseGuards } from "@nestjs/common";
-import { AuthGuard } from "../common/guards/auth.guard";
 
 @Resolver()
 export class UserResolver {

@@ -69,7 +69,7 @@ export class AuthService {
                                 jwt: this.jwtService.sign(
                                     genUserJwtPayload({ userId: user.id })
                                 ),
-                                user: user,
+                                user,
                             }))
                         );
                     })

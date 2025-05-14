@@ -1,8 +1,20 @@
 import { env } from "@/env";
-import { DefaultOptions, HttpLink, split } from "@apollo/client";
+import {
+    ApolloLink,
+    DefaultOptions,
+    HttpLink,
+    concat,
+    split,
+} from "@apollo/client";
 import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
 import { getMainDefinition } from "@apollo/client/utilities";
 import { createClient } from "graphql-ws";
+import Cookies from "universal-cookie";
+import { v4 as uuidv4 } from "uuid";
+
+type ClientHeaders = Readonly<{
+    headers: Record<string, string | undefined>;
+}>;
 
 const getWsServerEndpoint = () => {
     if (env.NEXT_PUBLIC_SERVER_ENDPOINT) {
@@ -45,19 +57,23 @@ export const httpLink = new HttpLink({
     uri: `${getServerEndpoint()}/api`,
 });
 
-export const clientLinks = wsLink
-    ? split(
-          ({ query }) => {
-              const definition = getMainDefinition(query);
-              return (
-                  definition.kind === "OperationDefinition" &&
-                  definition.operation === "subscription"
-              );
-          },
-          wsLink,
-          httpLink
-      )
-    : httpLink;
+export const authMiddleware = ({ headers }: ClientHeaders) => {
+    return new ApolloLink((operation, forward) => {
+        const cookies = new Cookies();
+        const token = cookies.get("ft100");
+
+        operation.setContext({
+            headers: {
+                authorization: token ? `Bearer ${token}` : "",
+                uuid: uuidv4(),
+                "x-client-id": "ft100",
+                ...headers,
+            },
+        });
+
+        return forward(operation);
+    });
+};
 
 export const defaultOptions: DefaultOptions = {
     watchQuery: {
@@ -73,3 +89,24 @@ export const defaultOptions: DefaultOptions = {
         errorPolicy: "all",
     },
 };
+
+export const getSsrLinks = ({ headers }: ClientHeaders) =>
+    concat(authMiddleware({ headers }), httpLink);
+
+export const getClientLinks = ({ headers }: ClientHeaders) =>
+    wsLink
+        ? concat(
+              authMiddleware({ headers }),
+              split(
+                  ({ query }) => {
+                      const definition = getMainDefinition(query);
+                      return (
+                          definition.kind === "OperationDefinition" &&
+                          definition.operation === "subscription"
+                      );
+                  },
+                  wsLink,
+                  httpLink
+              )
+          )
+        : concat(authMiddleware({ headers }), httpLink);

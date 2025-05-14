@@ -1,10 +1,11 @@
 "use client";
 
-import { AuthType } from "@/common/routes";
+import { AuthType, Route } from "@/common/routes";
 import { CallBack } from "@/common/types";
 import { Tabs, TabsContent, TabsTrigger } from "@/components/ui/tabs";
 import { ApolloError } from "@apollo/client";
 import {
+    useRegisterUserMutation,
     useValidateUserEmailMutation,
     useValidateUserTokenMutation,
 } from "@ods/server-lib";
@@ -14,6 +15,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import SignInForm from "../views/SignInForm";
 import { useUserStore } from "../zustand/store";
+import SignUpForm from "../views/SignUpForm";
 
 type AuthContainerProps = Readonly<{
     authType: AuthType | undefined;
@@ -22,6 +24,7 @@ type AuthContainerProps = Readonly<{
 export default function AuthContainer({ authType }: AuthContainerProps) {
     const [validateUserEmail] = useValidateUserEmailMutation();
     const [validateUserToken] = useValidateUserTokenMutation();
+    const [registerUser] = useRegisterUserMutation();
 
     const setUser = useUserStore((state) => state.setUser);
 
@@ -53,7 +56,7 @@ export default function AuthContainer({ authType }: AuthContainerProps) {
                     });
                 } else {
                     toast.success(
-                        "Your login code has been sent to you email."
+                        "Your login code has been sent to your email."
                     );
                     setUserEmail(email);
                 }
@@ -61,14 +64,17 @@ export default function AuthContainer({ authType }: AuthContainerProps) {
             },
             onError: (err) => {
                 cb?.onError?.(err);
-                toast(err.message, {
-                    duration: 10_000,
+                toast.error(err.message, {
+                    duration: 5000,
                 });
             },
         });
     };
 
-    const handleValidateToken = async (code: number) => {
+    const handleValidateToken = async (
+        code: number,
+        cb?: Partial<CallBack<boolean, ApolloError>>
+    ) => {
         await validateUserToken({
             variables: {
                 input: {
@@ -77,11 +83,44 @@ export default function AuthContainer({ authType }: AuthContainerProps) {
                 },
             },
             onCompleted: (data) => {
+                cb?.onComplete?.(true);
                 setUser(data.validateUserToken);
             },
             onError: (err) => {
-                console.log(err.message);
+                cb?.onError?.(err);
                 toast.error("Login code verification failed.");
+            },
+        });
+    };
+
+    const handleRegisterUser = async (
+        email: string,
+        cb?: Partial<CallBack<boolean, ApolloError>>
+    ) => {
+        await registerUser({
+            variables: {
+                input: {
+                    email,
+                },
+            },
+            onCompleted: (data) => {
+                if (!data.registerUser) {
+                    toast.error("Account registration failed.", {
+                        duration: 5000,
+                    });
+                } else {
+                    toast.success(
+                        "Your login code has been sent to your email."
+                    );
+                    setUserEmail(email);
+                }
+                cb?.onComplete?.(data.registerUser);
+            },
+            onError: (err) => {
+                cb?.onError?.(err);
+                toast.error(err.message, {
+                    duration: 5000,
+                });
             },
         });
     };
@@ -110,7 +149,12 @@ export default function AuthContainer({ authType }: AuthContainerProps) {
                             onValidateCode={handleValidateToken}
                         />
                     </TabsContent>
-                    <TabsContent value={AuthType.signUp}>Sign Up</TabsContent>
+                    <TabsContent value={AuthType.signUp}>
+                        <SignUpForm
+                            onRegisterUser={handleRegisterUser}
+                            onValidateCode={handleValidateToken}
+                        />
+                    </TabsContent>
                 </Tabs>
             </div>
         </div>

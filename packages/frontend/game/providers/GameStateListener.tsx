@@ -1,5 +1,3 @@
-"use client";
-
 import { ApolloError } from "@apollo/client";
 import { GameState, useListenToGameUpdatesSubscription } from "@ods/server-lib";
 import { useGameStore } from "../zustand/store";

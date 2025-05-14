@@ -1,8 +1,8 @@
 import { ApolloClient, InMemoryCache } from "@apollo/client";
-import { clientLinks, defaultOptions } from "./constants";
+import { getClientLinks, defaultOptions } from "./constants";
 
 export const client = new ApolloClient({
-    link: clientLinks,
+    link: getClientLinks({ headers: {} }),
     cache: new InMemoryCache({
         addTypename: false,
     }),

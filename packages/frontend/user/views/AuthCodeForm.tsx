@@ -11,7 +11,7 @@ import { REGEXP_ONLY_DIGITS } from "input-otp";
 import { z } from "zod";
 
 const ZFormSchema = z.object({
-    code: z.string(),
+    code: z.string().min(6),
 });
 
 type TFormSchema = z.infer<typeof ZFormSchema>;
@@ -28,8 +28,9 @@ export default function AuthCodeForm({ onSubmit }: AuthCodeFormProps) {
         validators: {
             onChange: ZFormSchema,
         },
-        onSubmit: async ({ value }) => {
+        onSubmit: async ({ value, formApi }) => {
             await onSubmit(Number(value.code));
+            formApi.reset();
         },
     });
 
@@ -42,7 +43,7 @@ export default function AuthCodeForm({ onSubmit }: AuthCodeFormProps) {
             }}
         >
             <div className="flex flex-col gap-4 items-center">
-                <h1 className="text sm:text-xl font-extrabold tracking-tight text-center text-black">
+                <h1 className="text sm:text-2xl font-extrabold tracking-tight text-center text-black">
                     Enter Login Code
                 </h1>
                 <form.Field name="code">
@@ -53,9 +54,7 @@ export default function AuthCodeForm({ onSubmit }: AuthCodeFormProps) {
                             value={state.value}
                             pattern={REGEXP_ONLY_DIGITS}
                             onBlur={handleBlur}
-                            onChange={(value) => {
-                                handleChange(value);
-                            }}
+                            onChange={handleChange}
                             disabled={form.state.isSubmitting}
                         >
                             <InputOTPGroup>

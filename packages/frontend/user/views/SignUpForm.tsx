@@ -1,4 +1,3 @@
-import { Route } from "@/common/routes";
 import { CallBack } from "@/common/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,11 +5,11 @@ import { Label } from "@/components/ui/label";
 import LoadingCircle from "@/components/ui/loading-circle";
 import { ApolloError } from "@apollo/client";
 import { useForm } from "@tanstack/react-form";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { match } from "ts-pattern";
 import { z } from "zod";
 import AuthCodeForm from "./AuthCodeForm";
+import SignUpConfirmation from "./SignUpConfirmation";
 
 const ZFormSchema = z.object({
     email: z.string().email("Please enter a valid email."),
@@ -18,8 +17,8 @@ const ZFormSchema = z.object({
 
 type TFormSchema = z.infer<typeof ZFormSchema>;
 
-export type SignInFormProps = Readonly<{
-    onValidateEmail: (
+type SignUpFormProps = Readonly<{
+    onRegisterUser: (
         email: string,
         cb?: Partial<CallBack<boolean, ApolloError>>
     ) => Promise<void>;
@@ -29,50 +28,49 @@ export type SignInFormProps = Readonly<{
     ) => Promise<void>;
 }>;
 
-enum SignInFormSteps {
+enum SignUpFormSteps {
     form = "form",
     code = "code",
+    confirmation = "confirmation",
 }
 
-export default function SignInForm({
-    onValidateEmail,
+export default function SignUpForm({
+    onRegisterUser,
     onValidateCode,
-}: SignInFormProps) {
-    const router = useRouter();
-    const [step, setStep] = useState<SignInFormSteps>(SignInFormSteps.form);
+}: SignUpFormProps) {
+    const [step, setStep] = useState<SignUpFormSteps>(SignUpFormSteps.form);
     return match(step)
-        .with(SignInFormSteps.form, () => (
-            <SignInView
+        .with(SignUpFormSteps.form, () => (
+            <SignUpView
                 onSubmit={async (email) => {
-                    await onValidateEmail(email, {
+                    await onRegisterUser(email, {
                         onComplete: (data) => {
                             if (data) {
-                                setStep(SignInFormSteps.code);
+                                setStep(SignUpFormSteps.code);
                             }
                         },
                     });
                 }}
             />
         ))
-        .with(SignInFormSteps.code, () => (
+        .with(SignUpFormSteps.code, () => (
             <AuthCodeForm
                 onSubmit={async (code) => {
                     await onValidateCode(code, {
                         onComplete: () => {
-                            router.push(Route.game);
+                            setStep(SignUpFormSteps.confirmation);
                         },
                     });
                 }}
             />
         ))
+        .with(SignUpFormSteps.confirmation, () => <SignUpConfirmation />)
         .exhaustive();
 }
 
-function SignInView({
+function SignUpView({
     onSubmit,
-}: Readonly<{
-    onSubmit: (email: string) => Promise<void>;
-}>) {
+}: Readonly<{ onSubmit: (email: string) => Promise<void> }>) {
     const form = useForm({
         defaultValues: {
             email: "",
@@ -127,7 +125,7 @@ function SignInView({
                 >
                     {([canSubmit, isSubmitting]) => (
                         <Button disabled={!canSubmit || isSubmitting}>
-                            {isSubmitting && <LoadingCircle />} Sign In
+                            {isSubmitting && <LoadingCircle />} Sign Up
                         </Button>
                     )}
                 </form.Subscribe>

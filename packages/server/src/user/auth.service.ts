@@ -55,17 +55,23 @@ export class AuthService {
                     Effect.flatMap((isValid) => {
                         if (!isValid) {
                             const err = new Error(
-                                "Submitted Code is not valid."
+                                "Submitted code is not valid."
                             );
                             this.logger.error(err.message);
                             return Effect.fail(err);
                         }
-                        return Effect.succeed({
-                            jwt: this.jwtService.sign(
-                                genUserJwtPayload({ userId: user.id })
-                            ),
-                            user: user,
-                        });
+                        return pipe(
+                            this.userService.updateUser({
+                                id: user.id,
+                                lastLoginAt: new Date(),
+                            }),
+                            Effect.map((user) => ({
+                                jwt: this.jwtService.sign(
+                                    genUserJwtPayload({ userId: user.id })
+                                ),
+                                user: user,
+                            }))
+                        );
                     })
                 );
             })

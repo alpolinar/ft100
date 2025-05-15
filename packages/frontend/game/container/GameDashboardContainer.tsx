@@ -68,7 +68,7 @@ export function GameDashboardContainer() {
 
     const form = useForm({
         defaultValues: {
-            gameId: game?.gameId ?? "",
+            gameId: "",
         } as TFormSchema,
         validators: {
             onChange: ZFormSchema,
@@ -80,9 +80,8 @@ export function GameDashboardContainer() {
 
     return (
         <div className="flex flex-col gap-2">
-            <p>build a UI for creating a game and joining a game</p>
             <Button onClick={handleCreateGame} disabled={game?.gameId !== ""}>
-                create game
+                Create Game
             </Button>
             <form
                 onSubmit={(e) => {

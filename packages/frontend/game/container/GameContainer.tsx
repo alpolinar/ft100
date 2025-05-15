@@ -1,11 +1,10 @@
 "use client";
 
-import { GameState } from "@ods/server-lib";
-import { GameStateListener } from "../providers/GameStateListener";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { Route } from "@/common/routes";
-import { isNullish } from "remeda";
+import { Button } from "@/components/ui/button";
+import { GameState } from "@ods/server-lib";
+import Link from "next/link";
+import GameView from "../views/GameView";
 
 export type GameContainerProps = Readonly<{ game: GameState }>;
 
@@ -19,17 +18,7 @@ export function GameContainer({ game }: GameContainerProps) {
             </div>
             <hr />
             <div className="h-full p-4">
-                <GameStateListener gameState={game}>
-                    {({ state, error }) => {
-                        return error ? (
-                            <div>something went wrong</div>
-                        ) : isNullish(state) ? (
-                            <div>loading...</div>
-                        ) : (
-                            <div>id: {state.id}</div>
-                        );
-                    }}
-                </GameStateListener>
+                <GameView state={game} />
             </div>
         </div>
     );

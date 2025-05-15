@@ -6,6 +6,9 @@ import {
     FetchGameStateQuery,
     FetchGameStateQueryVariables,
 } from "@ods/server-lib";
+import { isNullish } from "remeda";
+import { redirect } from "next/navigation";
+import { Route } from "@/common/routes";
 
 type GamePageProps = Params<{ gameId: string }>;
 
@@ -22,9 +25,10 @@ export default async function GamePage({ params }: GamePageProps) {
         },
     });
 
-    return data?.fetchGameState ? (
-        <GameContainer game={data.fetchGameState} />
-    ) : (
-        <div>no data</div>
-    );
+    if (isNullish(data)) {
+        redirect(Route.game);
+    }
+
+    // TODO: maybe show game unavailable ui if data is null
+    return <GameContainer game={data.fetchGameState} />;
 }

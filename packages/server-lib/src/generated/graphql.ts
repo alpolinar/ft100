@@ -80,7 +80,6 @@ export type InputCreateUser = {
 
 export type InputMove = {
     readonly gameId: Scalars["String"]["input"];
-    readonly userId: Scalars["String"]["input"];
     readonly value: Scalars["Int"]["input"];
 };
 
@@ -111,13 +110,6 @@ export type InputValidateToken = {
     readonly email: Scalars["String"]["input"];
 };
 
-export type Move = {
-    readonly gameId: Scalars["String"]["output"];
-    readonly id: Scalars["String"]["output"];
-    readonly userId: Scalars["String"]["output"];
-    readonly value: Scalars["Int"]["output"];
-};
-
 export type Mutation = {
     readonly connectPlayer: GameState;
     readonly createGame: GameState;
@@ -128,7 +120,7 @@ export type Mutation = {
 };
 
 export type MutationConnectPlayerArgs = {
-    input?: InputMaybe<InputConnectPlayer>;
+    input: InputConnectPlayer;
 };
 
 export type MutationCreateGameArgs = {
@@ -305,7 +297,6 @@ export type ResolversTypes = {
     InputValidateEmail: InputValidateEmail;
     InputValidateToken: InputValidateToken;
     Int: ResolverTypeWrapper<Scalars["Int"]["output"]>;
-    Move: ResolverTypeWrapper<Move>;
     Mutation: ResolverTypeWrapper<{}>;
     Query: ResolverTypeWrapper<{}>;
     String: ResolverTypeWrapper<Scalars["String"]["output"]>;
@@ -329,7 +320,6 @@ export type ResolversParentTypes = {
     InputValidateEmail: InputValidateEmail;
     InputValidateToken: InputValidateToken;
     Int: Scalars["Int"]["output"];
-    Move: Move;
     Mutation: {};
     Query: {};
     String: Scalars["String"]["output"];
@@ -394,18 +384,6 @@ export type GameStateResolvers<
     __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type MoveResolvers<
-    ContextType = any,
-    ParentType extends
-        ResolversParentTypes["Move"] = ResolversParentTypes["Move"],
-> = {
-    gameId?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
-    id?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
-    userId?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
-    value?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
-    __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
 export type MutationResolvers<
     ContextType = any,
     ParentType extends
@@ -415,7 +393,7 @@ export type MutationResolvers<
         ResolversTypes["GameState"],
         ParentType,
         ContextType,
-        Partial<MutationConnectPlayerArgs>
+        RequireFields<MutationConnectPlayerArgs, "input">
     >;
     createGame?: Resolver<
         ResolversTypes["GameState"],
@@ -520,7 +498,6 @@ export type Resolvers<ContextType = any> = {
     AuthenticatedUser?: AuthenticatedUserResolvers<ContextType>;
     Date?: GraphQLScalarType;
     GameState?: GameStateResolvers<ContextType>;
-    Move?: MoveResolvers<ContextType>;
     Mutation?: MutationResolvers<ContextType>;
     Query?: QueryResolvers<ContextType>;
     Subscription?: SubscriptionResolvers<ContextType>;

@@ -51,7 +51,6 @@ export function InputCreateUserSchema(): z.ZodObject<
 export function InputMoveSchema(): z.ZodObject<Properties<InputMove>> {
     return z.object({
         gameId: z.string(),
-        userId: z.string(),
         value: z.number(),
     });
 }

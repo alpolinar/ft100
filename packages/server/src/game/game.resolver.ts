@@ -4,6 +4,7 @@ import {
     GameState,
     InputConnectPlayer,
     InputCreateGame,
+    InputMove,
 } from "@ods/server-lib";
 import { Effect } from "effect";
 import { CurrentUser } from "src/common/decorators/current-user.decorator";
@@ -37,6 +38,21 @@ export class GameResolver {
     ): Promise<GameState> {
         return await Effect.runPromise(
             this.gameService.connectPlayer(input.gameId, currentUser.user.id)
+        );
+    }
+
+    @UseGuards(AuthGuard)
+    @Mutation("sendMove")
+    async sendMove(
+        @Args("input") input: InputMove,
+        @CurrentUser() currentUser: UserStrategyReturnType
+    ): Promise<GameState> {
+        return await Effect.runPromise(
+            this.gameService.playerMove({
+                gameId: input.gameId,
+                value: input.value,
+                playerId: currentUser.user.id,
+            })
         );
     }
 }

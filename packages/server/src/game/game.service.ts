@@ -7,7 +7,7 @@ import { SubscriptionsService } from "../subscriptions/subscriptions.service";
 import { UserEntity } from "../user/user.entity";
 import { convertToGameState } from "./game.convert";
 import { FindGameOptions, GameDataAccessLayer } from "./game.dal";
-import { isNonNullish } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 
 @Injectable()
 export class GameService {
@@ -184,8 +184,8 @@ export class GameService {
                                                     transaction,
                                                 }
                                             ),
-                                            Effect.map((gameState) =>
-                                                convertToGameState(gameState)
+                                            Effect.map((data) =>
+                                                convertToGameState(data)
                                             )
                                         );
                                     }
@@ -204,14 +204,80 @@ export class GameService {
                                                 },
                                                 { transaction }
                                             ),
-                                            Effect.map((gameState) =>
-                                                convertToGameState(gameState)
+                                            Effect.map((data) =>
+                                                convertToGameState(data)
                                             )
                                         );
                                     }
 
                                     return Effect.succeed(
                                         convertToGameState(gameState)
+                                    );
+                                },
+                            })
+                        )
+                    ),
+                onError: (err) => {
+                    this.logger.error(err.message);
+                },
+            })
+        );
+    }
+
+    playerMove(
+        input: Readonly<{
+            playerId: string;
+            gameId: string;
+            value: number;
+        }>
+    ): Effect.Effect<GameState, Error, never> {
+        return pipe(
+            this.sequelize,
+            withTransactionEffect({
+                effectFn: (transaction) =>
+                    pipe(
+                        this.gameDal.findOne({
+                            where: {
+                                gameId: input.gameId,
+                            },
+                        }),
+                        Effect.flatMap(
+                            Option.match({
+                                onNone: () => {
+                                    const err = new Error(
+                                        "No Game State Found!"
+                                    );
+                                    this.logger.error(err.message);
+                                    return Effect.fail(err);
+                                },
+                                onSome: (gameState) => {
+                                    if (isNullish(gameState.currentPlayerId)) {
+                                        const err = new Error(
+                                            "Impossible State!"
+                                        );
+                                        this.logger.error(err.message);
+                                        return Effect.fail(err);
+                                    }
+                                    const currentPlayerId =
+                                        gameState.currentPlayerId ===
+                                        input.playerId
+                                            ? gameState.fkPlayerTwoId
+                                            : gameState.fkPlayerOneId;
+                                    return pipe(
+                                        this.gameDal.update(
+                                            {
+                                                id: gameState.id,
+                                                gameId: gameState.id,
+                                                currentTotal:
+                                                    gameState.currentTotal +
+                                                    input.value,
+                                                currentPlayerId,
+                                            },
+                                            { transaction }
+                                        ),
+                                        Effect.map((data) =>
+                                            convertToGameState(data)
+                                        )
                                     );
                                 },
                             })

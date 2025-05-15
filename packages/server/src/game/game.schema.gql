@@ -10,15 +10,7 @@ type GameState {
     playerTwo: User
 }
 
-type Move {
-    id: String!
-    userId: String!
-    gameId: String!
-    value: Int!
-}
-
 input InputMove {
-    userId: String!
     gameId: String!
     value: Int!
 }

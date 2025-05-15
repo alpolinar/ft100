@@ -2,6 +2,7 @@ import { AuthenticatedUser } from "@ods/server-lib";
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 import Cookies from "universal-cookie";
+import { Applications, getCookies } from "@/graphql-client/constants";
 
 type Model = {
     authedUser: AuthenticatedUser | null;
@@ -18,6 +19,7 @@ const defaultState: Model = {
     authedUser: null,
 };
 
+const appCookies = getCookies(Applications.firstTo100);
 const cookies = new Cookies();
 
 export const useUserStore = create<UserStore>()(
@@ -25,9 +27,12 @@ export const useUserStore = create<UserStore>()(
         persist(
             (set) => ({
                 ...defaultState,
-                removeUser: () => set({ authedUser: null }),
+                removeUser: () => {
+                    cookies.remove(appCookies.jwt, { path: "/", secure: true });
+                    return set(defaultState);
+                },
                 setUser: (authedUser) => {
-                    cookies.set("ft100", authedUser.jwt, {
+                    cookies.set(appCookies.jwt, authedUser.jwt, {
                         path: "/",
                         maxAge: 2592000, // One Month
                         secure: true,

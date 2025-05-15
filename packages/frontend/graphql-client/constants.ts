@@ -9,12 +9,46 @@ import {
 import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
 import { getMainDefinition } from "@apollo/client/utilities";
 import { createClient } from "graphql-ws";
+import { match } from "ts-pattern";
 import Cookies from "universal-cookie";
 import { v4 as uuidv4 } from "uuid";
 
+export enum Applications {
+    firstTo100 = "firstTo100",
+}
+
+export type AppCookies = Readonly<{
+    uuid: string;
+    jwt: string;
+}>;
+
+export const ft100Cookies: AppCookies = {
+    jwt: "385c91cc81f6442cbdd4fe94b99fdc4d",
+    uuid: "a903014e16ad47c2809f71382da31b62",
+};
+
 type ClientHeaders = Readonly<{
     headers: Record<string, string | undefined>;
+    app: Applications;
 }>;
+
+export const getCookies = (app: Applications) => {
+    return match(app)
+        .with(Applications.firstTo100, () => ft100Cookies)
+        .exhaustive();
+};
+
+export const getJwtToken = (app: Applications) => {
+    const cookies = new Cookies();
+    const { jwt } = getCookies(app);
+    return cookies.get(jwt);
+};
+
+export const getUuid = (app: Applications) => {
+    const cookies = new Cookies();
+    const { uuid } = getCookies(app);
+    return cookies.get(uuid);
+};
 
 const getWsServerEndpoint = () => {
     if (env.NEXT_PUBLIC_SERVER_ENDPOINT) {
@@ -57,16 +91,16 @@ export const httpLink = new HttpLink({
     uri: `${getServerEndpoint()}/api`,
 });
 
-export const authMiddleware = ({ headers }: ClientHeaders) => {
+export const authMiddleware = ({ headers, app }: ClientHeaders) => {
     return new ApolloLink((operation, forward) => {
-        const cookies = new Cookies();
-        const token = cookies.get("ft100");
+        const token = getJwtToken(app);
+        const uuid = getUuid(app);
 
         operation.setContext({
             headers: {
                 authorization: token ? `Bearer ${token}` : "",
-                uuid: uuidv4(),
-                "x-client-id": "ft100",
+                uuid,
+                "x-client-id": app,
                 ...headers,
             },
         });
@@ -90,13 +124,13 @@ export const defaultOptions: DefaultOptions = {
     },
 };
 
-export const getSsrLinks = ({ headers }: ClientHeaders) =>
-    concat(authMiddleware({ headers }), httpLink);
+export const getSsrLinks = ({ headers, app }: ClientHeaders) =>
+    concat(authMiddleware({ headers, app }), httpLink);
 
-export const getClientLinks = ({ headers }: ClientHeaders) =>
+export const getClientLinks = ({ headers, app }: ClientHeaders) =>
     wsLink
         ? concat(
-              authMiddleware({ headers }),
+              authMiddleware({ headers, app }),
               split(
                   ({ query }) => {
                       const definition = getMainDefinition(query);
@@ -109,4 +143,4 @@ export const getClientLinks = ({ headers }: ClientHeaders) =>
                   httpLink
               )
           )
-        : concat(authMiddleware({ headers }), httpLink);
+        : concat(authMiddleware({ headers, app }), httpLink);

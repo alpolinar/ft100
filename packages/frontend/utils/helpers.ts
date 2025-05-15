@@ -1,8 +1,5 @@
-import { randomBytes } from "node:crypto";
-
 export function generateGameId(length = 10): string {
-    const chars =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     const array = new Uint8Array(length);
     crypto.getRandomValues(array);
 

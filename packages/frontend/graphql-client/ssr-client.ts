@@ -6,8 +6,12 @@ import {
 import { headers } from "next/headers";
 import { fromEntries } from "remeda";
 import Cookies from "universal-cookie";
-import { v4 as uuidv4 } from "uuid";
-import { defaultOptions, getSsrLinks } from "./constants";
+import {
+    Applications,
+    defaultOptions,
+    getCookies,
+    getSsrLinks,
+} from "./constants";
 
 export const { getClient, query, PreloadQuery } = registerApolloClient(
     async () => {
@@ -15,13 +19,16 @@ export const { getClient, query, PreloadQuery } = registerApolloClient(
         const appHeaders = fromEntries(hdrs.entries().toArray());
         const host = appHeaders.host;
         const userAgent = appHeaders["user-agent"];
-        const appCookies = new Cookies(appHeaders.cookie);
-        const token = appCookies.get("ft100");
+        const cookies = new Cookies(appHeaders.cookie);
+        const appCookies = getCookies(Applications.firstTo100);
+        const token = cookies.get(appCookies.jwt);
+        const uuid = cookies.get(appCookies.uuid);
 
         return new ApolloClient({
             link: getSsrLinks({
+                app: Applications.firstTo100,
                 headers: {
-                    uuid: uuidv4(),
+                    uuid,
                     "x-request-host": host,
                     authorization: `Bearer ${token}`,
                     "user-agent": userAgent,

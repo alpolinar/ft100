@@ -1,22 +1,12 @@
-import {
-    BadRequestException,
-    Inject,
-    Injectable,
-    Logger,
-    NotFoundException,
-} from "@nestjs/common";
-import {
-    GameState,
-    InputConnectPlayer,
-    InputCreateGame,
-} from "@ods/server-lib";
+import { Inject, Injectable, Logger } from "@nestjs/common";
+import { GameState, InputCreateGame } from "@ods/server-lib";
 import { Effect, Option, pipe } from "effect";
 import { Sequelize } from "sequelize-typescript";
 import { withTransactionEffect } from "../common/utils/helpers";
 import { SubscriptionsService } from "../subscriptions/subscriptions.service";
 import { UserEntity } from "../user/user.entity";
 import { convertToGameState } from "./game.convert";
-import { GameDataAccessLayer, GameOptions } from "./game.dal";
+import { FindGameOptions, GameDataAccessLayer } from "./game.dal";
 
 @Injectable()
 export class GameService {
@@ -32,7 +22,7 @@ export class GameService {
 
     fetchGameState(
         gameId: string,
-        options?: GameOptions
+        options?: FindGameOptions
     ): Effect.Effect<GameState, Error, never> {
         return pipe(
             this.gameDal.findOne({
@@ -114,59 +104,119 @@ export class GameService {
         );
     }
 
-    async connectPlayer(gameId: string, playerId: string): Promise<GameState> {
-        const gameStateOption = await Effect.runPromise(
-            this.gameDal.findOne({
-                where: {
-                    gameId,
+    connectPlayer(
+        gameId: string,
+        playerId: string
+    ): Effect.Effect<GameState, Error, never> {
+        return pipe(
+            this.sequelize,
+            withTransactionEffect({
+                effectFn: (transaction) =>
+                    pipe(
+                        this.gameDal.findOne({
+                            where: {
+                                gameId,
+                            },
+                            include: [
+                                {
+                                    model: UserEntity,
+                                    as: "winner",
+                                },
+                                {
+                                    model: UserEntity,
+                                    as: "playerOne",
+                                },
+                                {
+                                    model: UserEntity,
+                                    as: "playerTwo",
+                                },
+                            ],
+                        }),
+                        Effect.flatMap(
+                            Option.match({
+                                onNone: () => {
+                                    const err = new Error(
+                                        "No Game State Found!"
+                                    );
+                                    this.logger.error(err.message);
+                                    return Effect.fail(err);
+                                },
+                                onSome: (gameState) => {
+                                    const { fkPlayerOneId, fkPlayerTwoId } =
+                                        gameState;
+                                    if (
+                                        (fkPlayerOneId !== "" &&
+                                            fkPlayerOneId !== playerId) ||
+                                        (fkPlayerTwoId !== "" &&
+                                            fkPlayerTwoId !== playerId)
+                                    ) {
+                                        const err = new Error(
+                                            "Game Already Full"
+                                        );
+                                        this.logger.error(err.message);
+                                        return Effect.fail(err);
+                                    }
+
+                                    if (
+                                        fkPlayerOneId === playerId ||
+                                        fkPlayerTwoId === playerId
+                                    ) {
+                                        return Effect.succeed(gameState);
+                                    }
+
+                                    if (!fkPlayerOneId) {
+                                        return pipe(
+                                            this.gameDal.update(
+                                                {
+                                                    id: gameState.id,
+                                                    gameId: gameState.gameId,
+                                                    currentTotal:
+                                                        gameState.currentTotal,
+                                                    fkPlayerOneId: playerId,
+                                                    fkPlayerTwoId:
+                                                        gameState.fkPlayerTwoId,
+                                                },
+                                                {
+                                                    transaction,
+                                                }
+                                            ),
+                                            Effect.map((gameState) =>
+                                                convertToGameState(gameState)
+                                            )
+                                        );
+                                    }
+
+                                    if (!fkPlayerOneId) {
+                                        return pipe(
+                                            this.gameDal.update(
+                                                {
+                                                    id: gameState.id,
+                                                    gameId: gameState.gameId,
+                                                    currentTotal:
+                                                        gameState.currentTotal,
+                                                    fkPlayerOneId:
+                                                        gameState.fkPlayerOneId,
+                                                    fkPlayerTwoId: playerId,
+                                                },
+                                                { transaction }
+                                            ),
+                                            Effect.map((gameState) =>
+                                                convertToGameState(gameState)
+                                            )
+                                        );
+                                    }
+
+                                    return Effect.succeed(
+                                        convertToGameState(gameState)
+                                    );
+                                },
+                            })
+                        )
+                    ),
+                onError: (err) => {
+                    this.logger.error(err.message);
                 },
             })
         );
-
-        if (Option.isNone(gameStateOption)) {
-            throw new NotFoundException("No Game State Found");
-        }
-
-        const gameState = gameStateOption.value;
-        const { fkPlayerOneId, fkPlayerTwoId } = gameState;
-
-        if (
-            (fkPlayerOneId !== "" && fkPlayerOneId !== playerId) ||
-            (fkPlayerTwoId !== "" && fkPlayerTwoId !== playerId)
-        ) {
-            throw new BadRequestException("Game Already Full");
-        }
-
-        if (fkPlayerOneId === playerId || fkPlayerTwoId === playerId) {
-            return gameState;
-        }
-
-        if (!fkPlayerOneId) {
-            const newState = await Effect.runPromise(
-                this.gameDal.update({
-                    id: gameState.id,
-                    gameId: gameState.gameId,
-                    currentTotal: gameState.currentTotal,
-                    fkPlayerOneId: playerId,
-                    fkPlayerTwoId: gameState.fkPlayerTwoId,
-                })
-            );
-            return convertToGameState(newState);
-        }
-
-        if (!fkPlayerTwoId) {
-            const newState = await Effect.runPromise(
-                this.gameDal.update({
-                    id: gameState.id,
-                    gameId: gameState.gameId,
-                    currentTotal: gameState.currentTotal,
-                    fkPlayerOneId: gameState.fkPlayerOneId,
-                    fkPlayerTwoId: playerId,
-                })
-            );
-            return convertToGameState(newState);
-        }
-
-        return gameState;
     }
 }

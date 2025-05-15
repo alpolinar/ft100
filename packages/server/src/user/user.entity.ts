@@ -61,7 +61,7 @@ export class UserEntity extends Model<UserAttributes, UserCreateAttributes> {
         field: "verified",
         defaultValue: false,
     })
-    readonly veified: boolean;
+    readonly verified: boolean;
 
     @Column({
         type: DataType.STRING,

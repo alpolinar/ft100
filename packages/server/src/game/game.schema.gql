@@ -6,9 +6,8 @@ type GameState {
     winnerId: String
     fkPlayerOneId: String
     fkPlayerTwoId: String
-    # TODO: restore when user module is done
-    # playerOne: User
-    # playerTwo: User
+    playerOne: User
+    playerTwo: User
 }
 
 type Move {
@@ -48,14 +47,12 @@ fragment GameState on GameState {
     winnerId
     fkPlayerOneId
     fkPlayerTwoId
-    # TODO: restore when user module is done
-    #
-    # playerOne {
-    #     ...User
-    # }
-    # playerTwo {
-    #     ...User
-    # }
+    playerOne {
+        ...User
+    }
+    playerTwo {
+        ...User
+    }
 }
 
 type Query {
@@ -78,7 +75,7 @@ query fetchAllUserGames {
 type Mutation {
     createGame(input: InputCreateGame!): GameState!
     sendMove(input: InputMove!): GameState!
-    connectPlayer(input: InputConnectPlayer): GameState!
+    connectPlayer(input: InputConnectPlayer!): GameState!
 }
 
 mutation createGame($input: InputCreateGame!) {

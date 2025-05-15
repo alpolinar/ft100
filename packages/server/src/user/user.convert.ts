@@ -7,7 +7,7 @@ export function getUserAttributes(e: UserEntity): UserAttributes {
         id: e.id,
         username: e.username,
         lastLoginAt: e.lastLoginAt,
-        verified: e.veified,
+        verified: e.verified,
         email: e.email,
         img: e.img,
         token: e.token,

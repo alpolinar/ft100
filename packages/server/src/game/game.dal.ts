@@ -1,7 +1,7 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import { Effect, Option, flow, pipe } from "effect";
+import { FindOptions } from "sequelize";
 import { catchError } from "../common/utils/helpers";
-import { EntityOptions } from "../common/utils/type-helpers";
 import {
     GameCreateAttributes,
     GameEntity,
@@ -10,7 +10,7 @@ import {
 } from "./game.entity";
 import { GameAttributes } from "./game.model";
 
-export type GameOptions = EntityOptions<GameAttributes>;
+export type FindGameOptions = FindOptions<GameAttributes>;
 
 @Injectable()
 export class GameDataAccessLayer {
@@ -23,7 +23,7 @@ export class GameDataAccessLayer {
 
     findByPk(
         id: string,
-        options?: GameOptions
+        options?: FindGameOptions
     ): Effect.Effect<Option.Option<GameAttributes>, Error, never> {
         return pipe(
             Effect.tryPromise({
@@ -34,8 +34,9 @@ export class GameDataAccessLayer {
                     );
                 }),
             }),
-            Effect.map(
-                flow(
+            Effect.map((game) =>
+                pipe(
+                    game,
                     Option.fromNullable,
                     Option.map((e) => e.getGameAttributes)
                 )
@@ -44,7 +45,7 @@ export class GameDataAccessLayer {
     }
 
     findOne(
-        options: GameOptions
+        options: FindGameOptions
     ): Effect.Effect<Option.Option<GameAttributes>, Error, never> {
         return pipe(
             Effect.tryPromise({
@@ -53,8 +54,9 @@ export class GameDataAccessLayer {
                     this.logger.error(`No Game State Found. ${err.message}`);
                 }),
             }),
-            Effect.map(
-                flow(
+            Effect.map((game) =>
+                pipe(
+                    game,
                     Option.fromNullable,
                     Option.map((e) => e.getGameAttributes)
                 )
@@ -64,7 +66,7 @@ export class GameDataAccessLayer {
 
     create(
         values: GameCreateAttributes,
-        options?: Pick<GameOptions, "transaction">
+        options?: Pick<FindGameOptions, "transaction">
     ): Effect.Effect<GameAttributes, Error, never> {
         return pipe(
             Effect.tryPromise({
@@ -79,7 +81,7 @@ export class GameDataAccessLayer {
 
     update(
         values: GameUpdateAttributes,
-        options?: GameOptions
+        options?: FindGameOptions
     ): Effect.Effect<GameAttributes, Error> {
         return pipe(
             Effect.tryPromise({
@@ -123,7 +125,7 @@ export class GameDataAccessLayer {
 
     delete(
         id: string,
-        options?: GameOptions
+        options?: FindGameOptions
     ): Effect.Effect<Option.Option<number>, Error, never> {
         return pipe(
             Effect.tryPromise({

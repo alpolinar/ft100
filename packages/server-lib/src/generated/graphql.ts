@@ -60,6 +60,8 @@ export type GameState = {
     readonly fkPlayerTwoId?: Maybe<Scalars["String"]["output"]>;
     readonly gameId: Scalars["String"]["output"];
     readonly id: Scalars["String"]["output"];
+    readonly playerOne?: Maybe<User>;
+    readonly playerTwo?: Maybe<User>;
     readonly winnerId?: Maybe<Scalars["String"]["output"]>;
 };
 
@@ -374,6 +376,16 @@ export type GameStateResolvers<
     >;
     gameId?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
     id?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+    playerOne?: Resolver<
+        Maybe<ResolversTypes["User"]>,
+        ParentType,
+        ContextType
+    >;
+    playerTwo?: Resolver<
+        Maybe<ResolversTypes["User"]>,
+        ParentType,
+        ContextType
+    >;
     winnerId?: Resolver<
         Maybe<ResolversTypes["String"]>,
         ParentType,
@@ -528,6 +540,28 @@ export type GameStateFragment = {
     readonly winnerId?: string | undefined | null;
     readonly fkPlayerOneId?: string | undefined | null;
     readonly fkPlayerTwoId?: string | undefined | null;
+    readonly playerOne?:
+        | {
+              readonly id: string;
+              readonly username: string;
+              readonly email?: string | undefined | null;
+              readonly verified: boolean;
+              readonly img?: string | undefined | null;
+              readonly lastLoginAt?: Date | undefined | null;
+          }
+        | undefined
+        | null;
+    readonly playerTwo?:
+        | {
+              readonly id: string;
+              readonly username: string;
+              readonly email?: string | undefined | null;
+              readonly verified: boolean;
+              readonly img?: string | undefined | null;
+              readonly lastLoginAt?: Date | undefined | null;
+          }
+        | undefined
+        | null;
 };
 
 export type FetchGameStateQueryVariables = Exact<{
@@ -543,6 +577,28 @@ export type FetchGameStateQuery = {
         readonly winnerId?: string | undefined | null;
         readonly fkPlayerOneId?: string | undefined | null;
         readonly fkPlayerTwoId?: string | undefined | null;
+        readonly playerOne?:
+            | {
+                  readonly id: string;
+                  readonly username: string;
+                  readonly email?: string | undefined | null;
+                  readonly verified: boolean;
+                  readonly img?: string | undefined | null;
+                  readonly lastLoginAt?: Date | undefined | null;
+              }
+            | undefined
+            | null;
+        readonly playerTwo?:
+            | {
+                  readonly id: string;
+                  readonly username: string;
+                  readonly email?: string | undefined | null;
+                  readonly verified: boolean;
+                  readonly img?: string | undefined | null;
+                  readonly lastLoginAt?: Date | undefined | null;
+              }
+            | undefined
+            | null;
     };
 };
 
@@ -557,6 +613,28 @@ export type FetchAllUserGamesQuery = {
         readonly winnerId?: string | undefined | null;
         readonly fkPlayerOneId?: string | undefined | null;
         readonly fkPlayerTwoId?: string | undefined | null;
+        readonly playerOne?:
+            | {
+                  readonly id: string;
+                  readonly username: string;
+                  readonly email?: string | undefined | null;
+                  readonly verified: boolean;
+                  readonly img?: string | undefined | null;
+                  readonly lastLoginAt?: Date | undefined | null;
+              }
+            | undefined
+            | null;
+        readonly playerTwo?:
+            | {
+                  readonly id: string;
+                  readonly username: string;
+                  readonly email?: string | undefined | null;
+                  readonly verified: boolean;
+                  readonly img?: string | undefined | null;
+                  readonly lastLoginAt?: Date | undefined | null;
+              }
+            | undefined
+            | null;
     }>;
 };
 
@@ -573,6 +651,28 @@ export type CreateGameMutation = {
         readonly winnerId?: string | undefined | null;
         readonly fkPlayerOneId?: string | undefined | null;
         readonly fkPlayerTwoId?: string | undefined | null;
+        readonly playerOne?:
+            | {
+                  readonly id: string;
+                  readonly username: string;
+                  readonly email?: string | undefined | null;
+                  readonly verified: boolean;
+                  readonly img?: string | undefined | null;
+                  readonly lastLoginAt?: Date | undefined | null;
+              }
+            | undefined
+            | null;
+        readonly playerTwo?:
+            | {
+                  readonly id: string;
+                  readonly username: string;
+                  readonly email?: string | undefined | null;
+                  readonly verified: boolean;
+                  readonly img?: string | undefined | null;
+                  readonly lastLoginAt?: Date | undefined | null;
+              }
+            | undefined
+            | null;
     };
 };
 
@@ -589,6 +689,28 @@ export type SendMoveMutation = {
         readonly winnerId?: string | undefined | null;
         readonly fkPlayerOneId?: string | undefined | null;
         readonly fkPlayerTwoId?: string | undefined | null;
+        readonly playerOne?:
+            | {
+                  readonly id: string;
+                  readonly username: string;
+                  readonly email?: string | undefined | null;
+                  readonly verified: boolean;
+                  readonly img?: string | undefined | null;
+                  readonly lastLoginAt?: Date | undefined | null;
+              }
+            | undefined
+            | null;
+        readonly playerTwo?:
+            | {
+                  readonly id: string;
+                  readonly username: string;
+                  readonly email?: string | undefined | null;
+                  readonly verified: boolean;
+                  readonly img?: string | undefined | null;
+                  readonly lastLoginAt?: Date | undefined | null;
+              }
+            | undefined
+            | null;
     };
 };
 
@@ -605,6 +727,28 @@ export type ConnectPlayerMutation = {
         readonly winnerId?: string | undefined | null;
         readonly fkPlayerOneId?: string | undefined | null;
         readonly fkPlayerTwoId?: string | undefined | null;
+        readonly playerOne?:
+            | {
+                  readonly id: string;
+                  readonly username: string;
+                  readonly email?: string | undefined | null;
+                  readonly verified: boolean;
+                  readonly img?: string | undefined | null;
+                  readonly lastLoginAt?: Date | undefined | null;
+              }
+            | undefined
+            | null;
+        readonly playerTwo?:
+            | {
+                  readonly id: string;
+                  readonly username: string;
+                  readonly email?: string | undefined | null;
+                  readonly verified: boolean;
+                  readonly img?: string | undefined | null;
+                  readonly lastLoginAt?: Date | undefined | null;
+              }
+            | undefined
+            | null;
     };
 };
 
@@ -621,6 +765,28 @@ export type ListenToGameUpdatesSubscription = {
         readonly winnerId?: string | undefined | null;
         readonly fkPlayerOneId?: string | undefined | null;
         readonly fkPlayerTwoId?: string | undefined | null;
+        readonly playerOne?:
+            | {
+                  readonly id: string;
+                  readonly username: string;
+                  readonly email?: string | undefined | null;
+                  readonly verified: boolean;
+                  readonly img?: string | undefined | null;
+                  readonly lastLoginAt?: Date | undefined | null;
+              }
+            | undefined
+            | null;
+        readonly playerTwo?:
+            | {
+                  readonly id: string;
+                  readonly username: string;
+                  readonly email?: string | undefined | null;
+                  readonly verified: boolean;
+                  readonly img?: string | undefined | null;
+                  readonly lastLoginAt?: Date | undefined | null;
+              }
+            | undefined
+            | null;
     };
 };
 
@@ -694,17 +860,6 @@ export type ValidateUserTokenMutation = {
     };
 };
 
-export const GameStateFragmentDoc = gql`
-    fragment GameState on GameState {
-  id
-  gameId
-  currentTotal
-  currentPlayerId
-  winnerId
-  fkPlayerOneId
-  fkPlayerTwoId
-}
-    `;
 export const UserFragmentDoc = gql`
     fragment User on User {
   id
@@ -715,6 +870,23 @@ export const UserFragmentDoc = gql`
   lastLoginAt
 }
     `;
+export const GameStateFragmentDoc = gql`
+    fragment GameState on GameState {
+  id
+  gameId
+  currentTotal
+  currentPlayerId
+  winnerId
+  fkPlayerOneId
+  fkPlayerTwoId
+  playerOne {
+    ...User
+  }
+  playerTwo {
+    ...User
+  }
+}
+    ${UserFragmentDoc}`;
 export const AuthenticatedUserFragmentDoc = gql`
     fragment AuthenticatedUser on AuthenticatedUser {
   jwt

@@ -12,7 +12,7 @@ export function getGameAttributes(e: GameEntity): GameAttributes {
         gameId: e.gameId,
         fkPlayerOneId: e.fkPlayerOneId,
         playerOne: e.playerOne,
-        fkPlayerTwoId: e.fkPlayerOneId,
+        fkPlayerTwoId: e.fkPlayerTwoId,
         playerTwo: e.playerTwo,
         createdAt: e.createdAt,
         updatedAt: e.updatedAt,
@@ -35,19 +35,17 @@ export function convertToGameState(data: GameAttributes): GameState {
                   email: data.playerOne.email,
                   img: data.playerOne.img,
                   lastLoginAt: data.playerOne.lastLoginAt,
-                  token: data.playerOne.token,
               }
             : undefined,
-        fkPlayerTwoId: data.fkPlayerOneId,
-        playerTwo: data.playerOne
+        fkPlayerTwoId: data.fkPlayerTwoId,
+        playerTwo: data.playerTwo
             ? {
-                  id: data.playerOne.id,
-                  username: data.playerOne.username,
-                  verified: data.playerOne.verified,
-                  email: data.playerOne.email,
-                  img: data.playerOne.img,
-                  lastLoginAt: data.playerOne.lastLoginAt,
-                  token: data.playerOne.token,
+                  id: data.playerTwo.id,
+                  username: data.playerTwo.username,
+                  verified: data.playerTwo.verified,
+                  email: data.playerTwo.email,
+                  img: data.playerTwo.img,
+                  lastLoginAt: data.playerTwo.lastLoginAt,
               }
             : undefined,
         winnerId: data.winnerId,

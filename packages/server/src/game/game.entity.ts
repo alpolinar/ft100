@@ -72,7 +72,7 @@ export class GameEntity extends Model<GameAttributes, GameCreateAttributes> {
     })
     readonly winnerId?: string;
 
-    @BelongsTo(() => UserEntity, { as: "winner" })
+    @BelongsTo(() => UserEntity, { as: "winner", foreignKey: "winner_id" })
     readonly winner?: UserEntity;
 
     @ForeignKey(() => UserEntity)
@@ -83,7 +83,10 @@ export class GameEntity extends Model<GameAttributes, GameCreateAttributes> {
     })
     readonly fkPlayerOneId?: string;
 
-    @BelongsTo(() => UserEntity, { as: "playerOne" })
+    @BelongsTo(() => UserEntity, {
+        as: "playerOne",
+        foreignKey: "fk_player_one_id",
+    })
     readonly playerOne?: UserEntity;
 
     @ForeignKey(() => UserEntity)
@@ -94,7 +97,10 @@ export class GameEntity extends Model<GameAttributes, GameCreateAttributes> {
     })
     readonly fkPlayerTwoId?: string;
 
-    @BelongsTo(() => UserEntity, { as: "playerTwo" })
+    @BelongsTo(() => UserEntity, {
+        as: "playerTwo",
+        foreignKey: "fk_player_two_id",
+    })
     readonly playerTwo?: UserEntity;
 
     @CreatedAt

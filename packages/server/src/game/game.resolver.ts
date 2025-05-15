@@ -17,17 +17,8 @@ export class GameResolver {
 
     @UseGuards(AuthGuard)
     @Query("fetchGameState")
-    async fetchGameState(
-        @Args("id") id: string,
-        @CurrentUser() currentUser: UserStrategyReturnType
-    ): Promise<GameState> {
-        return await Effect.runPromise(
-            this.gameService.fetchGameState(id, {
-                where: {
-                    fkPlayerOneId: currentUser.user.id,
-                },
-            })
-        );
+    async fetchGameState(@Args("id") id: string): Promise<GameState> {
+        return await Effect.runPromise(this.gameService.fetchGameState(id));
     }
 
     @UseGuards(AuthGuard)

@@ -7,6 +7,7 @@ import { SubscriptionsService } from "../subscriptions/subscriptions.service";
 import { UserEntity } from "../user/user.entity";
 import { convertToGameState } from "./game.convert";
 import { FindGameOptions, GameDataAccessLayer } from "./game.dal";
+import { isNonNullish } from "remeda";
 
 @Injectable()
 export class GameService {
@@ -144,14 +145,15 @@ export class GameService {
                                 onSome: (gameState) => {
                                     const { fkPlayerOneId, fkPlayerTwoId } =
                                         gameState;
+
                                     if (
-                                        (fkPlayerOneId !== "" &&
-                                            fkPlayerOneId !== playerId) ||
-                                        (fkPlayerTwoId !== "" &&
-                                            fkPlayerTwoId !== playerId)
+                                        isNonNullish(fkPlayerOneId) &&
+                                        fkPlayerOneId !== playerId &&
+                                        isNonNullish(fkPlayerTwoId) &&
+                                        fkPlayerTwoId !== playerId
                                     ) {
                                         const err = new Error(
-                                            "Game Already Full"
+                                            "Game Already Full."
                                         );
                                         this.logger.error(err.message);
                                         return Effect.fail(err);
@@ -161,7 +163,9 @@ export class GameService {
                                         fkPlayerOneId === playerId ||
                                         fkPlayerTwoId === playerId
                                     ) {
-                                        return Effect.succeed(gameState);
+                                        return Effect.succeed(
+                                            convertToGameState(gameState)
+                                        );
                                     }
 
                                     if (!fkPlayerOneId) {
@@ -186,7 +190,7 @@ export class GameService {
                                         );
                                     }
 
-                                    if (!fkPlayerOneId) {
+                                    if (!fkPlayerTwoId) {
                                         return pipe(
                                             this.gameDal.update(
                                                 {

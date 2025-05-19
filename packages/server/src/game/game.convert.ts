@@ -49,5 +49,8 @@ export function convertToGameState(data: GameAttributes): GameState {
               }
             : undefined,
         winnerId: data.winnerId,
+        createdAt: data.createdAt,
+        updatedAt: data.updatedAt,
+        deletedAt: data.deletedAt,
     };
 }

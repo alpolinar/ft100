@@ -7,7 +7,7 @@ export class GraphQLOptions implements GqlOptionsFactory {
     private readonly logger = new Logger("GraphQLOptions");
     createGqlOptions(): ApolloDriverConfig {
         return {
-            playground: true,
+            playground: false,
             typePaths: ["./**/*.gql"],
             path: "/api",
             subscriptions: {

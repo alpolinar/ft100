@@ -8,7 +8,7 @@ type Model = {
 
 type Actions = Readonly<{
     setGame: (game: GameState) => void;
-    removeGame: () => void;
+    reset: () => void;
 }>;
 
 type GameStore = Model & Actions;
@@ -22,7 +22,7 @@ export const useGameStore = create<GameStore>()(
         persist(
             (set) => ({
                 ...defaultState,
-                removeGame: () => set({ game: null }),
+                reset: () => set({ game: null }),
                 setGame: (game) => set({ game }),
             }),
             {

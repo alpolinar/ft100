@@ -53,15 +53,26 @@ export type AuthenticatedUser = {
     readonly user: User;
 };
 
+export enum GamePhase {
+    Complete = "Complete",
+    CountdownToStart = "CountdownToStart",
+    DeterminingFirstPlayer = "DeterminingFirstPlayer",
+    InProgress = "InProgress",
+    WaitingForPlayers = "WaitingForPlayers",
+}
+
 export type GameState = {
+    readonly createdAt: Scalars["Date"]["output"];
     readonly currentPlayerId?: Maybe<Scalars["String"]["output"]>;
     readonly currentTotal: Scalars["Int"]["output"];
+    readonly deletedAt?: Maybe<Scalars["Date"]["output"]>;
     readonly fkPlayerOneId?: Maybe<Scalars["String"]["output"]>;
     readonly fkPlayerTwoId?: Maybe<Scalars["String"]["output"]>;
     readonly gameId: Scalars["String"]["output"];
     readonly id: Scalars["String"]["output"];
     readonly playerOne?: Maybe<User>;
     readonly playerTwo?: Maybe<User>;
+    readonly updatedAt: Scalars["Date"]["output"];
     readonly winnerId?: Maybe<Scalars["String"]["output"]>;
 };
 
@@ -287,6 +298,7 @@ export type ResolversTypes = {
     AuthenticatedUser: ResolverTypeWrapper<AuthenticatedUser>;
     Boolean: ResolverTypeWrapper<Scalars["Boolean"]["output"]>;
     Date: ResolverTypeWrapper<Scalars["Date"]["output"]>;
+    GamePhase: GamePhase;
     GameState: ResolverTypeWrapper<GameState>;
     InputConnectPlayer: InputConnectPlayer;
     InputCreateGame: InputCreateGame;
@@ -348,12 +360,18 @@ export type GameStateResolvers<
     ParentType extends
         ResolversParentTypes["GameState"] = ResolversParentTypes["GameState"],
 > = {
+    createdAt?: Resolver<ResolversTypes["Date"], ParentType, ContextType>;
     currentPlayerId?: Resolver<
         Maybe<ResolversTypes["String"]>,
         ParentType,
         ContextType
     >;
     currentTotal?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
+    deletedAt?: Resolver<
+        Maybe<ResolversTypes["Date"]>,
+        ParentType,
+        ContextType
+    >;
     fkPlayerOneId?: Resolver<
         Maybe<ResolversTypes["String"]>,
         ParentType,
@@ -376,6 +394,7 @@ export type GameStateResolvers<
         ParentType,
         ContextType
     >;
+    updatedAt?: Resolver<ResolversTypes["Date"], ParentType, ContextType>;
     winnerId?: Resolver<
         Maybe<ResolversTypes["String"]>,
         ParentType,
@@ -517,6 +536,9 @@ export type GameStateFragment = {
     readonly winnerId?: string | undefined | null;
     readonly fkPlayerOneId?: string | undefined | null;
     readonly fkPlayerTwoId?: string | undefined | null;
+    readonly createdAt: Date;
+    readonly updatedAt: Date;
+    readonly deletedAt?: Date | undefined | null;
     readonly playerOne?:
         | {
               readonly id: string;
@@ -554,6 +576,9 @@ export type FetchGameStateQuery = {
         readonly winnerId?: string | undefined | null;
         readonly fkPlayerOneId?: string | undefined | null;
         readonly fkPlayerTwoId?: string | undefined | null;
+        readonly createdAt: Date;
+        readonly updatedAt: Date;
+        readonly deletedAt?: Date | undefined | null;
         readonly playerOne?:
             | {
                   readonly id: string;
@@ -590,6 +615,9 @@ export type FetchAllUserGamesQuery = {
         readonly winnerId?: string | undefined | null;
         readonly fkPlayerOneId?: string | undefined | null;
         readonly fkPlayerTwoId?: string | undefined | null;
+        readonly createdAt: Date;
+        readonly updatedAt: Date;
+        readonly deletedAt?: Date | undefined | null;
         readonly playerOne?:
             | {
                   readonly id: string;
@@ -628,6 +656,9 @@ export type CreateGameMutation = {
         readonly winnerId?: string | undefined | null;
         readonly fkPlayerOneId?: string | undefined | null;
         readonly fkPlayerTwoId?: string | undefined | null;
+        readonly createdAt: Date;
+        readonly updatedAt: Date;
+        readonly deletedAt?: Date | undefined | null;
         readonly playerOne?:
             | {
                   readonly id: string;
@@ -666,6 +697,9 @@ export type SendMoveMutation = {
         readonly winnerId?: string | undefined | null;
         readonly fkPlayerOneId?: string | undefined | null;
         readonly fkPlayerTwoId?: string | undefined | null;
+        readonly createdAt: Date;
+        readonly updatedAt: Date;
+        readonly deletedAt?: Date | undefined | null;
         readonly playerOne?:
             | {
                   readonly id: string;
@@ -704,6 +738,9 @@ export type ConnectPlayerMutation = {
         readonly winnerId?: string | undefined | null;
         readonly fkPlayerOneId?: string | undefined | null;
         readonly fkPlayerTwoId?: string | undefined | null;
+        readonly createdAt: Date;
+        readonly updatedAt: Date;
+        readonly deletedAt?: Date | undefined | null;
         readonly playerOne?:
             | {
                   readonly id: string;
@@ -742,6 +779,9 @@ export type ListenToGameUpdatesSubscription = {
         readonly winnerId?: string | undefined | null;
         readonly fkPlayerOneId?: string | undefined | null;
         readonly fkPlayerTwoId?: string | undefined | null;
+        readonly createdAt: Date;
+        readonly updatedAt: Date;
+        readonly deletedAt?: Date | undefined | null;
         readonly playerOne?:
             | {
                   readonly id: string;
@@ -862,6 +902,9 @@ export const GameStateFragmentDoc = gql`
   playerTwo {
     ...User
   }
+  createdAt
+  updatedAt
+  deletedAt
 }
     ${UserFragmentDoc}`;
 export const AuthenticatedUserFragmentDoc = gql`

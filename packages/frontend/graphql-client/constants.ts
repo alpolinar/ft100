@@ -69,6 +69,12 @@ export const wsLink =
         ? new GraphQLWsLink(
               createClient({
                   url: `${getWsServerEndpoint()}/api/sub`,
+                  shouldRetry: () => true,
+                  retryAttempts: 10,
+                  retryWait: async function randomExponentialBackOff(retries) {
+                      const retryDelay = Math.random() * 1000 * 2 ** retries;
+                      await new Promise((res) => setTimeout(res, retryDelay));
+                  },
               })
           )
         : undefined;
@@ -112,7 +118,7 @@ export const authMiddleware = ({ headers, app }: ClientHeaders) => {
 export const defaultOptions: DefaultOptions = {
     watchQuery: {
         fetchPolicy: "no-cache",
-        errorPolicy: "ignore",
+        errorPolicy: "all",
     },
     query: {
         fetchPolicy: "no-cache",

@@ -1,13 +1,8 @@
 import { ApolloError } from "@apollo/client";
 import { GameState, useListenToGameUpdatesSubscription } from "@ods/server-lib";
-import { useGameStore } from "../zustand/store";
-import { useEffect, useRef } from "react";
-import { isDeepEqual } from "remeda";
+import { useEffect, useState } from "react";
 
-export function GameStateListener({
-    gameState,
-    children,
-}: Readonly<{
+export type GameStateListenerProps = Readonly<{
     gameState: GameState;
     children: React.FC<
         Readonly<{
@@ -15,39 +10,29 @@ export function GameStateListener({
             error?: ApolloError;
         }>
     >;
-}>) {
-    const game = useGameStore((state) => state.game);
-    const setGame = useGameStore((state) => state.setGame);
+}>;
 
-    const didInit = useRef(false);
-
+export function GameStateListener({
+    gameState,
+    children,
+}: GameStateListenerProps) {
+    const [state, setState] = useState<GameState | null>(gameState);
     const { data, error } = useListenToGameUpdatesSubscription({
         variables: {
             channelId: gameState.id,
         },
         shouldResubscribe: true,
+        fetchPolicy: "network-only",
     });
 
     useEffect(() => {
-        if (!didInit.current) {
-            if (!game) {
-                setGame(gameState);
-            }
-            didInit.current = true;
+        if (data?.listenToGameUpdates) {
+            setState(data.listenToGameUpdates);
         }
-    }, [game, gameState, setGame]);
-
-    useEffect(() => {
-        if (
-            data?.listenToGameUpdates &&
-            !isDeepEqual(data.listenToGameUpdates, game)
-        ) {
-            setGame(data.listenToGameUpdates);
-        }
-    }, [data, game, setGame]);
+    }, [data]);
 
     return children({
-        state: game,
+        state,
         error,
     });
 }

@@ -1,17 +1,38 @@
-import { Inject, Injectable, Logger } from "@nestjs/common";
+import {
+    BadRequestException,
+    Inject,
+    Injectable,
+    Logger,
+    NotFoundException,
+} from "@nestjs/common";
 import { GameState, InputCreateGame } from "@ods/server-lib";
 import { Effect, Option, pipe } from "effect";
+import { isNonNullish, isNullish } from "remeda";
 import { Sequelize } from "sequelize-typescript";
 import { withTransactionEffect } from "../common/utils/helpers";
 import { SubscriptionsService } from "../subscriptions/subscriptions.service";
 import { UserEntity } from "../user/user.entity";
 import { convertToGameState } from "./game.convert";
 import { FindGameOptions, GameDataAccessLayer } from "./game.dal";
-import { isNonNullish, isNullish } from "remeda";
+import { Includeable } from "sequelize";
 
 @Injectable()
 export class GameService {
     private readonly logger = new Logger("GameService");
+    private readonly playerInclude: Includeable[] = [
+        {
+            model: UserEntity,
+            as: "winner",
+        },
+        {
+            model: UserEntity,
+            as: "playerOne",
+        },
+        {
+            model: UserEntity,
+            as: "playerTwo",
+        },
+    ];
 
     constructor(
         @Inject(GameDataAccessLayer)
@@ -32,17 +53,15 @@ export class GameService {
                     ...options?.where,
                     gameId,
                 },
-                include: [
-                    { model: UserEntity, as: "winner" },
-                    { model: UserEntity, as: "playerOne" },
-                    { model: UserEntity, as: "playerTwo" },
-                ],
+                include: this.playerInclude,
             }),
             Effect.flatMap(
                 Option.match({
                     onNone: () => {
-                        const err = new Error("No Game State Found!");
-                        this.logger.error(err.message);
+                        const err = new NotFoundException(
+                            "No Game State Found!"
+                        );
+                        this.logger.error(`${err.message}. gameId=${gameId}`);
                         return Effect.fail(err);
                     },
                     onSome: (data) => {
@@ -88,7 +107,7 @@ export class GameService {
                         Effect.flatMap(
                             Option.match({
                                 onNone: () => {
-                                    const err = new Error(
+                                    const err = new BadRequestException(
                                         `Failed to delete game with ID: ${id}.`
                                     );
                                     this.logger.error(err.message);
@@ -118,20 +137,7 @@ export class GameService {
                             where: {
                                 gameId,
                             },
-                            include: [
-                                {
-                                    model: UserEntity,
-                                    as: "winner",
-                                },
-                                {
-                                    model: UserEntity,
-                                    as: "playerOne",
-                                },
-                                {
-                                    model: UserEntity,
-                                    as: "playerTwo",
-                                },
-                            ],
+                            include: this.playerInclude,
                         }),
                         Effect.flatMap(
                             Option.match({
@@ -153,7 +159,7 @@ export class GameService {
                                         fkPlayerTwoId !== playerId
                                     ) {
                                         const err = new Error(
-                                            "Game Already Full."
+                                            `Game Already Full. gameId=${gameState.gameId} playerOneId=${gameState.fkPlayerOneId} playerTwoId=${gameState.fkPlayerTwoId}`
                                         );
                                         this.logger.error(err.message);
                                         return Effect.fail(err);
@@ -177,16 +183,24 @@ export class GameService {
                                                     currentTotal:
                                                         gameState.currentTotal,
                                                     fkPlayerOneId: playerId,
-                                                    fkPlayerTwoId:
-                                                        gameState.fkPlayerTwoId,
                                                 },
                                                 {
                                                     transaction,
+                                                    include: this.playerInclude,
                                                 }
                                             ),
                                             Effect.map((data) =>
                                                 convertToGameState(data)
-                                            )
+                                            ),
+                                            Effect.tap((state) => {
+                                                this.subscription.listenToGameUpdates(
+                                                    state.id,
+                                                    {
+                                                        listenToGameUpdates:
+                                                            state,
+                                                    }
+                                                );
+                                            })
                                         );
                                     }
 
@@ -198,17 +212,31 @@ export class GameService {
                                                     gameId: gameState.gameId,
                                                     currentTotal:
                                                         gameState.currentTotal,
-                                                    fkPlayerOneId:
-                                                        gameState.fkPlayerOneId,
                                                     fkPlayerTwoId: playerId,
                                                 },
-                                                { transaction }
+                                                {
+                                                    transaction,
+                                                    include: this.playerInclude,
+                                                }
                                             ),
                                             Effect.map((data) =>
                                                 convertToGameState(data)
-                                            )
+                                            ),
+                                            Effect.tap((state) => {
+                                                this.subscription.listenToGameUpdates(
+                                                    state.id,
+                                                    {
+                                                        listenToGameUpdates:
+                                                            state,
+                                                    }
+                                                );
+                                            })
                                         );
                                     }
+
+                                    this.logger.warn(
+                                        `Unexpected fallback case in connectPlayer. gameId=${gameState.gameId} playerId=${playerId}`
+                                    );
 
                                     return Effect.succeed(
                                         convertToGameState(gameState)

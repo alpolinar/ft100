@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger } from "@nestjs/common";
+import { Inject, Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { Effect, Option, flow, pipe } from "effect";
 import { FindOptions } from "sequelize";
 import { catchError } from "../common/utils/helpers";

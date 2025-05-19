@@ -1,3 +1,11 @@
+enum GamePhase {
+    WaitingForPlayers
+    CountdownToStart
+    DeterminingFirstPlayer
+    InProgress
+    Complete
+}
+
 type GameState {
     id: String!
     gameId: String!
@@ -8,6 +16,9 @@ type GameState {
     fkPlayerTwoId: String
     playerOne: User
     playerTwo: User
+    createdAt: Date!
+    updatedAt: Date!
+    deletedAt: Date
 }
 
 input InputMove {
@@ -45,6 +56,9 @@ fragment GameState on GameState {
     playerTwo {
         ...User
     }
+    createdAt
+    updatedAt
+    deletedAt
 }
 
 type Query {

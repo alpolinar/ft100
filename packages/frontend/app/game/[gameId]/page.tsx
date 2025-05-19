@@ -1,14 +1,14 @@
+import { Route } from "@/common/routes";
 import { Params } from "@/common/ssr-params";
-import { query } from "@/graphql-client/ssr-client";
 import { GameContainer } from "@/game/container/GameContainer";
+import { query } from "@/graphql-client/ssr-client";
 import {
     FetchGameStateDocument,
     FetchGameStateQuery,
     FetchGameStateQueryVariables,
 } from "@ods/server-lib";
-import { isNullish } from "remeda";
 import { redirect } from "next/navigation";
-import { Route } from "@/common/routes";
+import { isNullish } from "remeda";
 
 type GamePageProps = Params<{ gameId: string }>;
 

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import {
+    GamePhase,
     InputConnectPlayer,
     InputCreateGame,
     InputCreateUser,
@@ -22,6 +23,8 @@ export const isDefinedNonNullAny = (v: any): v is definedNonNullAny =>
 export const definedNonNullAnySchema = z
     .any()
     .refine((v) => isDefinedNonNullAny(v));
+
+export const GamePhaseSchema = z.nativeEnum(GamePhase);
 
 export function InputConnectPlayerSchema(): z.ZodObject<
     Properties<InputConnectPlayer>

@@ -108,6 +108,7 @@ export class GameDataAccessLayer {
                                         fkPlayerOneId: values.fkPlayerOneId,
                                         fkPlayerTwoId: values.fkPlayerTwoId,
                                         winnerId: values.winnerId,
+                                        phase: values.phase,
                                     })
                                 );
 

@@ -12,7 +12,7 @@ import {
 } from "sequelize-typescript";
 import { UserEntity } from "../user/user.entity";
 import { getGameAttributes } from "./game.convert";
-import { GameAttributes } from "./game.model";
+import { GameAttributes, GamePhase } from "./game.model";
 
 export const GameProvider = "GAME_PROVIDER" as const;
 
@@ -56,6 +56,15 @@ export class GameEntity extends Model<GameAttributes, GameCreateAttributes> {
         allowNull: false,
     })
     readonly currentTotal: number;
+
+    @Column({
+        type: DataType.ENUM({
+            values: Object.keys(GamePhase),
+        }),
+        field: "phase",
+        defaultValue: GamePhase.WaitingForPlayers,
+    })
+    readonly phase: GamePhase;
 
     @Column({
         type: DataType.UUID,

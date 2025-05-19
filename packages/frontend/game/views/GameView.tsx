@@ -9,11 +9,13 @@ import { isNullish } from "remeda";
 import { match } from "ts-pattern";
 import { GameStateListener } from "../providers/GameStateListener";
 import { useUserStore } from "@/user/zustand/store";
+import { useGameStore } from "../zustand/store";
 
 export type GameProps = Readonly<{ state: GameState }>;
 
 export default function GameView({ state }: GameProps) {
     const authedUser = useUserStore((state) => state.authedUser);
+    const setGame = useGameStore((state) => state.setGame);
     const [connectPlayer] = useConnectPlayerMutation();
 
     useEffect(() => {
@@ -32,9 +34,12 @@ export default function GameView({ state }: GameProps) {
                         gameId: state.gameId,
                     },
                 },
+                onCompleted: (data) => {
+                    setGame(data.connectPlayer);
+                },
             });
         }
-    }, [state, connectPlayer, authedUser]);
+    }, [state, connectPlayer, authedUser, setGame]);
 
     return (
         <GameStateListener gameState={state}>
@@ -45,28 +50,29 @@ export default function GameView({ state }: GameProps) {
                 if (isNullish(state)) {
                     return <div>loading...</div>;
                 }
-
-                const phase = getGamePhase(state);
+                console.log("state", state);
 
                 // TODO:
                 // 1. show waiting state if player 2 hasn't joined
                 // 2. show player has joined and countdown for game starting
                 // 3. build a janken mini-game to determine who goes first
 
-                return match(phase)
-                    .with(GamePhase.WaitingForPlayers, () => (
+                return match(state)
+                    .with({ phase: GamePhase.WaitingForPlayers }, () => (
                         <div>waiting for players</div>
                     ))
-                    .with(GamePhase.CountdownToStart, () => (
+                    .with({ phase: GamePhase.CountdownToStart }, () => (
                         <div>count down ui</div>
                     ))
-                    .with(GamePhase.DeterminingFirstPlayer, () => (
+                    .with({ phase: GamePhase.DeterminingFirstPlayer }, () => (
                         <div>determining first player</div>
                     ))
-                    .with(GamePhase.InProgress, () => (
+                    .with({ phase: GamePhase.InProgress }, () => (
                         <div>playing game ui</div>
                     ))
-                    .with(GamePhase.Complete, () => <div>game ended</div>)
+                    .with({ phase: GamePhase.Complete }, () => (
+                        <div>game ended</div>
+                    ))
                     .exhaustive();
             }}
         </GameStateListener>

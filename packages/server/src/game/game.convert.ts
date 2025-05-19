@@ -7,6 +7,7 @@ export function getGameAttributes(e: GameEntity): GameAttributes {
         id: e.id,
         currentTotal: e.currentTotal,
         currentPlayerId: e.currentPlayerId,
+        phase: e.phase,
         winnerId: e.winnerId,
         winner: e.winner,
         gameId: e.gameId,
@@ -25,6 +26,7 @@ export function convertToGameState(data: GameAttributes): GameState {
         id: data.id,
         gameId: data.gameId,
         currentTotal: data.currentTotal,
+        phase: data.phase,
         currentPlayerId: data.currentPlayerId,
         fkPlayerOneId: data.fkPlayerOneId,
         playerOne: data.playerOne

@@ -15,6 +15,7 @@ import { UserEntity } from "../user/user.entity";
 import { convertToGameState } from "./game.convert";
 import { FindGameOptions, GameDataAccessLayer } from "./game.dal";
 import { Includeable } from "sequelize";
+import { GamePhase } from "./game.model";
 
 @Injectable()
 export class GameService {
@@ -86,6 +87,7 @@ export class GameService {
                             {
                                 gameId: input.gameId,
                                 currentTotal: 0,
+                                phase: GamePhase.WaitingForPlayers,
                             },
                             { transaction }
                         ),
@@ -180,6 +182,7 @@ export class GameService {
                                                 {
                                                     id: gameState.id,
                                                     gameId: gameState.gameId,
+                                                    phase: gameState.phase,
                                                     currentTotal:
                                                         gameState.currentTotal,
                                                     fkPlayerOneId: playerId,
@@ -210,6 +213,7 @@ export class GameService {
                                                 {
                                                     id: gameState.id,
                                                     gameId: gameState.gameId,
+                                                    phase: GamePhase.CountdownToStart,
                                                     currentTotal:
                                                         gameState.currentTotal,
                                                     fkPlayerTwoId: playerId,
@@ -296,6 +300,7 @@ export class GameService {
                                             {
                                                 id: gameState.id,
                                                 gameId: gameState.id,
+                                                phase: gameState.phase,
                                                 currentTotal:
                                                     gameState.currentTotal +
                                                     input.value,

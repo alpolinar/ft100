@@ -70,6 +70,7 @@ export type GameState = {
     readonly fkPlayerTwoId?: Maybe<Scalars["String"]["output"]>;
     readonly gameId: Scalars["String"]["output"];
     readonly id: Scalars["String"]["output"];
+    readonly phase: GamePhase;
     readonly playerOne?: Maybe<User>;
     readonly playerTwo?: Maybe<User>;
     readonly updatedAt: Scalars["Date"]["output"];
@@ -384,6 +385,7 @@ export type GameStateResolvers<
     >;
     gameId?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
     id?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+    phase?: Resolver<ResolversTypes["GamePhase"], ParentType, ContextType>;
     playerOne?: Resolver<
         Maybe<ResolversTypes["User"]>,
         ParentType,
@@ -532,6 +534,7 @@ export type GameStateFragment = {
     readonly id: string;
     readonly gameId: string;
     readonly currentTotal: number;
+    readonly phase: GamePhase;
     readonly currentPlayerId?: string | undefined | null;
     readonly winnerId?: string | undefined | null;
     readonly fkPlayerOneId?: string | undefined | null;
@@ -572,6 +575,7 @@ export type FetchGameStateQuery = {
         readonly id: string;
         readonly gameId: string;
         readonly currentTotal: number;
+        readonly phase: GamePhase;
         readonly currentPlayerId?: string | undefined | null;
         readonly winnerId?: string | undefined | null;
         readonly fkPlayerOneId?: string | undefined | null;
@@ -611,6 +615,7 @@ export type FetchAllUserGamesQuery = {
         readonly id: string;
         readonly gameId: string;
         readonly currentTotal: number;
+        readonly phase: GamePhase;
         readonly currentPlayerId?: string | undefined | null;
         readonly winnerId?: string | undefined | null;
         readonly fkPlayerOneId?: string | undefined | null;
@@ -652,6 +657,7 @@ export type CreateGameMutation = {
         readonly id: string;
         readonly gameId: string;
         readonly currentTotal: number;
+        readonly phase: GamePhase;
         readonly currentPlayerId?: string | undefined | null;
         readonly winnerId?: string | undefined | null;
         readonly fkPlayerOneId?: string | undefined | null;
@@ -693,6 +699,7 @@ export type SendMoveMutation = {
         readonly id: string;
         readonly gameId: string;
         readonly currentTotal: number;
+        readonly phase: GamePhase;
         readonly currentPlayerId?: string | undefined | null;
         readonly winnerId?: string | undefined | null;
         readonly fkPlayerOneId?: string | undefined | null;
@@ -734,6 +741,7 @@ export type ConnectPlayerMutation = {
         readonly id: string;
         readonly gameId: string;
         readonly currentTotal: number;
+        readonly phase: GamePhase;
         readonly currentPlayerId?: string | undefined | null;
         readonly winnerId?: string | undefined | null;
         readonly fkPlayerOneId?: string | undefined | null;
@@ -775,6 +783,7 @@ export type ListenToGameUpdatesSubscription = {
         readonly id: string;
         readonly gameId: string;
         readonly currentTotal: number;
+        readonly phase: GamePhase;
         readonly currentPlayerId?: string | undefined | null;
         readonly winnerId?: string | undefined | null;
         readonly fkPlayerOneId?: string | undefined | null;
@@ -892,6 +901,7 @@ export const GameStateFragmentDoc = gql`
   id
   gameId
   currentTotal
+  phase
   currentPlayerId
   winnerId
   fkPlayerOneId

@@ -10,6 +10,7 @@ type GameState {
     id: String!
     gameId: String!
     currentTotal: Int!
+    phase: GamePhase!
     currentPlayerId: String
     winnerId: String
     fkPlayerOneId: String
@@ -46,6 +47,7 @@ fragment GameState on GameState {
     id
     gameId
     currentTotal
+    phase
     currentPlayerId
     winnerId
     fkPlayerOneId

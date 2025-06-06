@@ -1,4 +1,3 @@
-import { getGamePhase } from "@/utils/helpers";
 import {
     GamePhase,
     GameState,
@@ -10,6 +9,7 @@ import { match } from "ts-pattern";
 import { GameStateListener } from "../providers/GameStateListener";
 import { useUserStore } from "@/user/zustand/store";
 import { useGameStore } from "../zustand/store";
+import GameStartCountdown from "./GameStartCountdown";
 
 export type GameProps = Readonly<{ state: GameState }>;
 
@@ -28,6 +28,7 @@ export default function GameView({ state }: GameProps) {
             fkPlayerTwoId === authedUser.user.id;
 
         if (!isAlreadyInGame) {
+            console.log("if");
             connectPlayer({
                 variables: {
                     input: {
@@ -50,7 +51,6 @@ export default function GameView({ state }: GameProps) {
                 if (isNullish(state)) {
                     return <div>loading...</div>;
                 }
-                console.log("state", state);
 
                 // TODO:
                 // 1. show waiting state if player 2 hasn't joined
@@ -61,12 +61,15 @@ export default function GameView({ state }: GameProps) {
                     .with({ phase: GamePhase.WaitingForPlayers }, () => (
                         <div>waiting for players</div>
                     ))
-                    .with({ phase: GamePhase.CountdownToStart }, () => (
-                        <div>count down ui</div>
-                    ))
-                    .with({ phase: GamePhase.DeterminingFirstPlayer }, () => (
-                        <div>determining first player</div>
-                    ))
+                    .with(
+                        { phase: GamePhase.CountdownToStart },
+                        ({ countdownEndsAt, serverTime }) => (
+                            <GameStartCountdown
+                                countdownEndsAt={countdownEndsAt}
+                                serverTime={serverTime}
+                            />
+                        )
+                    )
                     .with({ phase: GamePhase.InProgress }, () => (
                         <div>playing game ui</div>
                     ))

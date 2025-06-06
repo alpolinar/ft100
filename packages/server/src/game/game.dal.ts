@@ -109,6 +109,7 @@ export class GameDataAccessLayer {
                                         fkPlayerTwoId: values.fkPlayerTwoId,
                                         winnerId: values.winnerId,
                                         phase: values.phase,
+                                        countdownEndsAt: values.countdownEndsAt,
                                     })
                                 );
 

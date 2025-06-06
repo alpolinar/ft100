@@ -112,6 +112,13 @@ export class GameEntity extends Model<GameAttributes, GameCreateAttributes> {
     })
     readonly playerTwo?: UserEntity;
 
+    @Column({
+        type: DataType.DATE,
+        field: "countdown_ends_at",
+        allowNull: true,
+    })
+    readonly countdownEndsAt?: Date;
+
     @CreatedAt
     @Column({ type: DataType.DATE, field: "created_at", allowNull: false })
     readonly createdAt: Date;

@@ -15,6 +15,7 @@ export function getGameAttributes(e: GameEntity): GameAttributes {
         playerOne: e.playerOne,
         fkPlayerTwoId: e.fkPlayerTwoId,
         playerTwo: e.playerTwo,
+        countdownEndsAt: e.countdownEndsAt,
         createdAt: e.createdAt,
         updatedAt: e.updatedAt,
         deletedAt: e.deletedAt,
@@ -29,6 +30,7 @@ export function convertToGameState(data: GameAttributes): GameState {
         phase: data.phase,
         currentPlayerId: data.currentPlayerId,
         fkPlayerOneId: data.fkPlayerOneId,
+        serverTime: new Date(),
         playerOne: data.playerOne
             ? {
                   id: data.playerOne.id,
@@ -51,6 +53,7 @@ export function convertToGameState(data: GameAttributes): GameState {
               }
             : undefined,
         winnerId: data.winnerId,
+        countdownEndsAt: data.countdownEndsAt,
         createdAt: data.createdAt,
         updatedAt: data.updatedAt,
         deletedAt: data.deletedAt,

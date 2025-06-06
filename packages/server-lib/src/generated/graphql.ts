@@ -56,12 +56,12 @@ export type AuthenticatedUser = {
 export enum GamePhase {
     Complete = "Complete",
     CountdownToStart = "CountdownToStart",
-    DeterminingFirstPlayer = "DeterminingFirstPlayer",
     InProgress = "InProgress",
     WaitingForPlayers = "WaitingForPlayers",
 }
 
 export type GameState = {
+    readonly countdownEndsAt?: Maybe<Scalars["Date"]["output"]>;
     readonly createdAt: Scalars["Date"]["output"];
     readonly currentPlayerId?: Maybe<Scalars["String"]["output"]>;
     readonly currentTotal: Scalars["Int"]["output"];
@@ -73,6 +73,7 @@ export type GameState = {
     readonly phase: GamePhase;
     readonly playerOne?: Maybe<User>;
     readonly playerTwo?: Maybe<User>;
+    readonly serverTime: Scalars["Date"]["output"];
     readonly updatedAt: Scalars["Date"]["output"];
     readonly winnerId?: Maybe<Scalars["String"]["output"]>;
 };
@@ -361,6 +362,11 @@ export type GameStateResolvers<
     ParentType extends
         ResolversParentTypes["GameState"] = ResolversParentTypes["GameState"],
 > = {
+    countdownEndsAt?: Resolver<
+        Maybe<ResolversTypes["Date"]>,
+        ParentType,
+        ContextType
+    >;
     createdAt?: Resolver<ResolversTypes["Date"], ParentType, ContextType>;
     currentPlayerId?: Resolver<
         Maybe<ResolversTypes["String"]>,
@@ -396,6 +402,7 @@ export type GameStateResolvers<
         ParentType,
         ContextType
     >;
+    serverTime?: Resolver<ResolversTypes["Date"], ParentType, ContextType>;
     updatedAt?: Resolver<ResolversTypes["Date"], ParentType, ContextType>;
     winnerId?: Resolver<
         Maybe<ResolversTypes["String"]>,
@@ -539,6 +546,8 @@ export type GameStateFragment = {
     readonly winnerId?: string | undefined | null;
     readonly fkPlayerOneId?: string | undefined | null;
     readonly fkPlayerTwoId?: string | undefined | null;
+    readonly countdownEndsAt?: Date | undefined | null;
+    readonly serverTime: Date;
     readonly createdAt: Date;
     readonly updatedAt: Date;
     readonly deletedAt?: Date | undefined | null;
@@ -580,6 +589,8 @@ export type FetchGameStateQuery = {
         readonly winnerId?: string | undefined | null;
         readonly fkPlayerOneId?: string | undefined | null;
         readonly fkPlayerTwoId?: string | undefined | null;
+        readonly countdownEndsAt?: Date | undefined | null;
+        readonly serverTime: Date;
         readonly createdAt: Date;
         readonly updatedAt: Date;
         readonly deletedAt?: Date | undefined | null;
@@ -620,6 +631,8 @@ export type FetchAllUserGamesQuery = {
         readonly winnerId?: string | undefined | null;
         readonly fkPlayerOneId?: string | undefined | null;
         readonly fkPlayerTwoId?: string | undefined | null;
+        readonly countdownEndsAt?: Date | undefined | null;
+        readonly serverTime: Date;
         readonly createdAt: Date;
         readonly updatedAt: Date;
         readonly deletedAt?: Date | undefined | null;
@@ -662,6 +675,8 @@ export type CreateGameMutation = {
         readonly winnerId?: string | undefined | null;
         readonly fkPlayerOneId?: string | undefined | null;
         readonly fkPlayerTwoId?: string | undefined | null;
+        readonly countdownEndsAt?: Date | undefined | null;
+        readonly serverTime: Date;
         readonly createdAt: Date;
         readonly updatedAt: Date;
         readonly deletedAt?: Date | undefined | null;
@@ -704,6 +719,8 @@ export type SendMoveMutation = {
         readonly winnerId?: string | undefined | null;
         readonly fkPlayerOneId?: string | undefined | null;
         readonly fkPlayerTwoId?: string | undefined | null;
+        readonly countdownEndsAt?: Date | undefined | null;
+        readonly serverTime: Date;
         readonly createdAt: Date;
         readonly updatedAt: Date;
         readonly deletedAt?: Date | undefined | null;
@@ -746,6 +763,8 @@ export type ConnectPlayerMutation = {
         readonly winnerId?: string | undefined | null;
         readonly fkPlayerOneId?: string | undefined | null;
         readonly fkPlayerTwoId?: string | undefined | null;
+        readonly countdownEndsAt?: Date | undefined | null;
+        readonly serverTime: Date;
         readonly createdAt: Date;
         readonly updatedAt: Date;
         readonly deletedAt?: Date | undefined | null;
@@ -788,6 +807,8 @@ export type ListenToGameUpdatesSubscription = {
         readonly winnerId?: string | undefined | null;
         readonly fkPlayerOneId?: string | undefined | null;
         readonly fkPlayerTwoId?: string | undefined | null;
+        readonly countdownEndsAt?: Date | undefined | null;
+        readonly serverTime: Date;
         readonly createdAt: Date;
         readonly updatedAt: Date;
         readonly deletedAt?: Date | undefined | null;
@@ -912,6 +933,8 @@ export const GameStateFragmentDoc = gql`
   playerTwo {
     ...User
   }
+  countdownEndsAt
+  serverTime
   createdAt
   updatedAt
   deletedAt

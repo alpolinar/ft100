@@ -1,7 +1,6 @@
 enum GamePhase {
     WaitingForPlayers
     CountdownToStart
-    DeterminingFirstPlayer
     InProgress
     Complete
 }
@@ -17,6 +16,8 @@ type GameState {
     fkPlayerTwoId: String
     playerOne: User
     playerTwo: User
+    countdownEndsAt: Date
+    serverTime: Date!
     createdAt: Date!
     updatedAt: Date!
     deletedAt: Date
@@ -58,6 +59,8 @@ fragment GameState on GameState {
     playerTwo {
         ...User
     }
+    countdownEndsAt
+    serverTime
     createdAt
     updatedAt
     deletedAt

@@ -9,21 +9,3 @@ export function generateGameId(length = 10): string {
         .join("")
         .toUpperCase();
 }
-
-export function getGamePhase(state: GameState): GamePhase {
-    const { fkPlayerOneId, fkPlayerTwoId, winnerId, currentPlayerId } = state;
-
-    if (!fkPlayerOneId || !fkPlayerTwoId) {
-        return GamePhase.WaitingForPlayers;
-    }
-
-    if (winnerId) {
-        return GamePhase.Complete;
-    }
-
-    if (!currentPlayerId) {
-        return GamePhase.DeterminingFirstPlayer;
-    }
-
-    return GamePhase.InProgress;
-}

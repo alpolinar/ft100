@@ -217,6 +217,9 @@ export class GameService {
                                                     currentTotal:
                                                         gameState.currentTotal,
                                                     fkPlayerTwoId: playerId,
+                                                    countdownEndsAt: new Date(
+                                                        Date.now() + 50_000
+                                                    ),
                                                 },
                                                 {
                                                     transaction,
